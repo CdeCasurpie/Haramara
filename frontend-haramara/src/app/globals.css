@@ -1,12 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Color Palette */
+  --primary-color: #005CAD;      /* Azul principal profundo */
+  --secondary-color: #01D3E8;    /* Azul turquesa brillante */
+  --primary-accent-color: #023859; /* Azul oscuro */
+  --ternary-color: #09DCE6;      /* Azul turquesa claro */
+  --complementary-color: #F7F7F7; /* Blanco grisáceo */
+  --border-color: #E6E6E6;       /* Gris claro */
+  --text-color: #000;            /* Gris oscuro */
+
+  /* System Colors */
+  --background: var(--complementary-color);
+  --foreground: var(--primary-accent-color);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--primary-accent-color);
+    --foreground: var(--complementary-color);
   }
 }
 
@@ -39,4 +51,36 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+
+.amiri-light {
+  font-family: "Amiri", serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+
+.amiri-regular {
+  font-family: "Amiri", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.amiri-bold {
+  font-family: "Amiri", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.amiri-regular-italic {
+  font-family: "Amiri", serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.amiri-bold-italic {
+  font-family: "Amiri", serif;
+  font-weight: 700;
+  font-style: italic;
 }
