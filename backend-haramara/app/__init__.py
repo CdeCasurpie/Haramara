@@ -16,9 +16,6 @@ def create_app():
     # Inicializar la base de datos
     db.init_app(app)
 
-    # Inicializar JWT con la aplicación
-    app.config["JWT_SECRET_KEY"] = "super_secret_key"
-
     # Crear tablas en la base de datos (solo en desarrollo)
     with app.app_context():
         db.create_all()
