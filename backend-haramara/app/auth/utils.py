@@ -1,5 +1,5 @@
 from flask_jwt_extended import create_access_token
-from app.models import User, Companies
+from app.models import Users, Companies
 
 def get_post_data(request, required_fields=None):
     """
@@ -42,7 +42,7 @@ def search_user(email, password):
     Busca un usuario en la base de datos
     """
 
-    user = User.query.filter_by(email=email).first()
+    user = Users.query.filter_by(email=email).first()
 
     if user and user.password == password:
         return user
