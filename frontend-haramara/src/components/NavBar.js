@@ -25,7 +25,7 @@ const NavBar = () => {
 
           {/* Navigation Links */}
           <div className={styles.navLinks}>
-            <Link href="/actividades" className={styles.link}>
+            <Link href="/client/activities" className={styles.link}>
               Actividades
             </Link>
             <Link href="/cursos" className={styles.link}>

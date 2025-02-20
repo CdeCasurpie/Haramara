@@ -10,7 +10,6 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <div className={styles.container}>
-      <NavBar />
       <SearchBar />
 
       <div style={{width: '60%', display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '1800px', margin: 'auto'}}>
