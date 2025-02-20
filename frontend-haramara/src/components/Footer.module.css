@@ -1,0 +1,121 @@
+.footer {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 4rem 0 1rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.mainSection {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.brandSection {
+    max-width: 500px;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    text-decoration: none;
+    color: white;
+}
+
+.logo {
+    border-radius: 50%;
+}
+
+.brandName {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.description {
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.linksSection h3,
+.contactSection h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.linksSection nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.linksSection a {
+    color: white;
+    text-decoration: none;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+.linksSection a:hover {
+    opacity: 1;
+}
+
+.contactInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contactItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+.contactItem:hover {
+    opacity: 1;
+}
+
+.icon {
+    font-size: 1.2rem;
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .mainSection {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    }
+
+    .brandSection {
+    max-width: 100%;
+    }
+
+    .footer {
+    padding: 3rem 0 1rem;
+    }
+}
+
+.bar {
+    width: 2px;
+    background-color: var(--complementary-color);
+    opacity: 0.2;
+    content: "";
+}

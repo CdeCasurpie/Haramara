@@ -1,95 +1,68 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import NavBar from "@/components/NavBar";
+import styles from './page.module.css';
+import SearchBar from "@/components/home/SearchBar";
+import ActivityCard from "@/components/home/ActivityCard";
+import BannerCard from "@/components/home/BannerCard";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className={styles.container}>
+      <NavBar />
+      <SearchBar />
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <div style={{width: '60%', display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '1800px', margin: 'auto'}}>
+        
+      
+      <h2
+        className={styles.subtitle}
+      >¿Qué quieres hacer hoy?</h2>
+      <div className={styles.activityCardContainer}>
+        <ActivityCard imageUrl={'/images/home/kids.jpg'} text={'Actividades para niños'} href={"https://google.com"} color={'#005CAD'} />
+        <ActivityCard imageUrl={'/images/home/family.jpg'} text={'Actividades en familia'} href={"https://google.com"} color={'#09DCE6'} />
+        <ActivityCard imageUrl={'/images/home/profesional.jpg'} text={'Actividades para profesionales'} href={"https://google.com"} color={'#005CAD'} />
+        <ActivityCard imageUrl={'/images/home/adultos.jpg'} text={'Actividades para adultos'} href={"https://google.com"} color={'#09DCE6'} />
+      </div>
+
+      <br></br>
+      <br></br>
+
+      <BannerCard
+        imageUrl="/images/home/buceo.jpg"
+        mainText="Busca, encuentra y compra."
+        subText="Tu actividad, tu curso, tu producto favorito."
+        href="/buscar"
+        side="left"
+      />
+
+
+      <br></br>
+      <br></br>
+
+      <BannerCard
+        imageUrl="/images/home/tienda.jpg"
+        mainText="Y si eres tienda, potencia tu negocio."
+        subText="Entra, regístrate y vende."
+        href="/buscar"
+        side="right"
+      />
+      
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+
+      </div>
+
+
+      <Footer />
     </div>
   );
 }
