@@ -14,9 +14,33 @@
   width: 100%;
   color: var(--text-color);
   margin-top: 2.5rem;
+  font-size: 1.1rem;
   text-align: left;
-  font-size: 1.3rem;
   font-weight: 500;
   margin-bottom: 2.5rem;
   text-transform: uppercase;
+}
+
+.content {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1800px;
+  margin: auto;
+}
+
+
+/* media queerie */
+
+@media screen and (max-width: 768px) {
+  .activityCardContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .content {
+    width: 100%;
+    padding: 0 20px;
+  }
 }

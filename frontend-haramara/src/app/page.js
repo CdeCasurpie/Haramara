@@ -13,7 +13,7 @@ export default function Home() {
       <NavBar />
       <SearchBar />
 
-      <div style={{width: '60%', display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '1800px', margin: 'auto'}}>
+      <div className={styles.content}>
         
       
       <h2

@@ -15,8 +15,8 @@ const NavBar = () => {
               <Image
                 src="/icons/logos/haramara.svg"
                 alt="Haramara logo"
-                width={95}
-                height={95}
+                width={80}
+                height={80}
                 className={styles.logoImage}
               />
               <span className={styles.logoText + " amiri-light"}>HARAMARA</span>

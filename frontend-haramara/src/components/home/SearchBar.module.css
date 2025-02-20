@@ -33,14 +33,14 @@
 }
 
 .title {
-  font-size: 3.5rem;
-  font-weight: bold;
+  font-size: 3rem;
+  font-weight: 500;
   margin-bottom: 2.5rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .subtitle {
-  font-size: 1.77rem;
+  font-size: 1.5rem;
   margin-bottom: 2rem;
   font-weight: 700;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
@@ -100,5 +100,21 @@
   .textContainer {
     margin-left: 0;
     text-align: center;
+  }
+
+  .content {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 40px;
+    text-align: left;
+    color: white;
+  }
+
+  .container {
+    position: relative;
+    width: 100%;
+    height: 550px;
+    background-image: url('/images/home/main.png');
+    background-position: center;
   }
 }
