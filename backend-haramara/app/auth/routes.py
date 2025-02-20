@@ -14,7 +14,6 @@ def login():
     """
 
     # obtain data
-
     data, missing = get_post_data(request, ['email', 'password', 'type'])
 
     if not data:
@@ -23,22 +22,27 @@ def login():
     if not is_valid_email(data['email']):
         return jsonify({'success': False, 'message': 'invalid email'}), 400
 
-
-    user = search_user(data['email'], data['password']) if data['type'] == 'user' else search_company(data['email'], data['password'])
-
-    if not user or user.id == None:
-        return jsonify({'success': False, 'message': 'user not found'}), 404
+    if data['type'] not in ['user', 'company']:
+        return jsonify({'success': False, 'message': 'invalid type'}), 400
     
-    token = generate_token(user.id, data['type'])
+    entity = search_user(data['email']) if data['type'] == 'user' else search_company(data['email'], data['password'])
+
+    if not entity or entity.id == None:
+        return jsonify({'success': False, 'message': 'user or company not found'}), 404
+    
+    if not entity.check_password(data['password']):
+        return jsonify({'success': False, 'message': 'incorrect password'}), 401
+
+    # generate token
+    token = generate_token(entity.id, data['type'])
 
     # returns token and user data
     return jsonify({
         'success': True,
         'token': token,
         'user': {
-            'id': user.id,
-            'name': user.name,
-            'email': user.email,
+            'id': entity.id,
+            'email': entity.email,
             'type': data['type']
         }
     }), 200
@@ -56,11 +60,97 @@ def register_user():
     """
     Registra un usuario
     """
-    return jsonify({'message': 'not implemented yet'}), 501
+    data, missing = get_post_data(request, ['username', 'email', 'password'])
+
+    if not data:
+        return jsonify({'success': False, 'message': 'missing fields', 'missing': missing}), 400
+    
+    if not is_valid_email(data['email']): 
+        return jsonify({'success': False, 'message': 'invalid email'}), 400
+    
+    existing_user = search_user(data['email'])
+
+    if existing_user:
+        return jsonify({'success': False, 'message': 'user already exists'}), 409
+    
+    #creamos nuevo usuario
+    new_user = Users(username=data['username'], email=data['email'], password=data['password'])
+
+    try:
+        new_user.save()
+
+        return jsonify({'success': True, 'message': 'user created successfully', 'data': {
+            'id': new_user.id,
+            'username': new_user.username,
+            'email': new_user.email
+        }}), 201
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': 'error creating user: ' + str(e)}), 500
+
 
 @auth_bp.route('/auth/register/company', methods=['POST'])
 def register_company():
     """
     Registra una empresa
     """
-    return jsonify({'message': 'not implemented yet'}), 501
+    data, missing = get_post_data(request, ['name', 'email', 'password', 'name_representative', 'last_name_representative', "is_safe", "has_languages",  'address', 'country', 'comunity', 'province', 'postal_code'])
+
+    if not data:
+        return jsonify({'success': False, 'message': 'missing fields', 'missing': missing}), 400
+    
+    if not is_valid_email(data['email']):
+        return jsonify({'success': False, 'message': 'invalid email'}), 400
+    
+    with db.session.begin():
+        existing_company = search_company(data['email'])
+
+        if existing_company:
+            return jsonify({'success': False, 'message': 'company already exists'}), 409
+        
+        #verificamos unicidad de nombre de empresa
+        if Companies.query.filter_by(name=data['name']).first():
+            return jsonify({'success': False, 'message': 'company name already exists'}), 409
+
+        #creamos nueva ubicacion
+        new_location = Locations(address=data['address'], country=data['country'], comunity=data['comunity'], province=data['province'], postal_code=data['postal_code'])
+        
+        #verificamos si la ubicacion ya existe
+        if search_location(new_location):
+            return jsonify({'success': False, 'message': 'location already exists'}), 409
+        
+        # Creamos una compañía dentro de una sesión
+        try:
+            new_location = Locations(
+                address=data['address'], 
+                country=data['country'], 
+                comunity=data['comunity'], 
+                province=data['province'], 
+                postal_code=data['postal_code']
+            )
+            db.session.add(new_location) 
+            db.session.flush() 
+
+            new_company = Companies(
+                name=data['name'], 
+                email=data['email'], 
+                password=data['password'], 
+                name_representative=data['name_representative'], 
+                last_name_representative=data['last_name_representative'], 
+                is_safe=data['is_safe'], 
+                has_languages=data['has_languages'], 
+                id_location=new_location.id
+            )
+            db.session.add(new_company)
+            db.session.flush()
+
+            return jsonify({'success': True, 'message': 'company created successfully', 'data': {
+                'id': new_company.id,
+                'name': new_company.name,
+                'email': new_company.email
+            }}), 201
+
+        except Exception as e:
+            db.session.rollback()  # Revierte cambios en caso de error
+            return jsonify({'success': False, 'message': 'error creating company: ' + str(e)}), 500

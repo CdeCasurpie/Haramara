@@ -1,5 +1,5 @@
 from flask_jwt_extended import create_access_token
-from app.models import Users, Companies
+from app.models import Users, Companies, Locations, db
 
 def get_post_data(request, required_fields=None):
     """
@@ -37,33 +37,30 @@ def is_valid_email(email):
     return False
 
 
-def search_user(email, password):
+def search_user(email):
     """
     Busca un usuario en la base de datos
     """
 
     user = Users.query.filter_by(email=email).first()
 
-    if user and user.password == password:
-        return user
-
-    return None
+    return user
 
 
-def search_company(email, password):
+def search_company(email):
     """
     Busca una empresa en la base de datos
     """
 
-    # TODO: implementar search_company
-
     company = Companies.query.filter_by(email=email).first()
+    return company
 
-    if company and company.password == password:
-        return company
-
-    return None
-
+def search_location(new_location):
+    """
+    Busca una ubicacion en la base de datos
+    """
+    location = Locations.query.filter_by(address=new_location.address, country=new_location.country, comunity=new_location.comunity, province=new_location.province, postal_code=new_location.postal_code).first()
+    return location
 
 def generate_token(user_id, type):
     """
@@ -75,3 +72,4 @@ def generate_token(user_id, type):
     }
 
     return create_access_token(identity=payload)
+

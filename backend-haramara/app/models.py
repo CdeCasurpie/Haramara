@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+import bcrypt
 
 db = SQLAlchemy()
 
@@ -7,10 +8,17 @@ class Users(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     url_image = db.Column(db.String(120), nullable=True)
+    password = db.Column(db.String(120), nullable=False)
 
-    def __init__(self, username, email):
+    def __init__(self, username, email, password):
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
         self.username = username
         self.email = email
+        self.password = hashed_password.decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
 
     def save(self):
         db.session.add(self)
@@ -22,9 +30,9 @@ class Users(db.Model):
 
 class Locations(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    direction = db.Column(db.String(120), nullable=False)
+    address = db.Column(db.String(120), nullable=False)
     country = db.Column(db.String(120), nullable=False)
-    comunities = db.Column(db.String(120), nullable=False)
+    comunity = db.Column(db.String(120), nullable=False)
     province = db.Column(db.String(120), nullable=False)
     postal_code = db.Column(db.String(120), nullable=False)
 
@@ -40,14 +48,32 @@ class Companies(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
     id_location = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
     url_image_logo = db.Column(db.String(120), nullable=True)
     url_image_portada = db.Column(db.String(120), nullable=True)
     name_representative = db.Column(db.String(80), nullable=False)
     last_name_representative = db.Column(db.String(80), nullable=False)
+    is_safe = db.Column(db.Boolean, nullable=False)
+    has_languages = db.Column(db.Boolean, nullable=False)
 
     def __repr__(self):
         return f'<Companies {self.name}>'
+    
+    def __init__(self, name, email, password, id_location, name_representative, last_name_representative, is_safe, has_languages):
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        self.name = name
+        self.email = email
+        self.password = hashed_password.decode('utf-8')
+        self.id_location = id_location
+        self.name_representative = name_representative
+        self.last_name_representative = last_name_representative
+        self.is_safe = is_safe
+        self.has_languages = has_languages
+
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
 
     def save(self):
         db.session.add(self)

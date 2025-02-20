@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
+from flask_jwt_extended import JWTManager
 
 from app.auth import auth_bp
 from app.client import client_bp
@@ -13,8 +14,12 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+
     # Inicializar la base de datos
     db.init_app(app)
+
+    # Initialize JWT
+    jwt = JWTManager(app)
 
     # Crear tablas en la base de datos (solo en desarrollo)
     with app.app_context():
