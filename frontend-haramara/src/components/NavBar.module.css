@@ -1,8 +1,10 @@
 .navbar {
-width: 100%;
-background-color: white;
-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-padding: 12px 20px;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0px -4px 20px rgb(0 0 0 / 18%);
+    padding: 12px 20px;
+    position: relative;
+    z-index: 100;
 }
 
 .container {
@@ -99,4 +101,36 @@ color: var(--primary-color);
 .mobileMenuButton {
     display: none;
 }
+}
+
+
+@media (max-width: 768px) {
+    .logoText {
+        margin-left: 0.5rem;
+        font-size: 1.4rem;
+        color: var(--primary-color);
+        display: none;
+    }
+}
+
+.profileInfoText {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.profileInfoSubText {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    opacity: 0.5;
+}
+
+.profilePhoto {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin: 0 12px;
+}
+
+.profileInfo {
+    padding-right: 10px;
 }
