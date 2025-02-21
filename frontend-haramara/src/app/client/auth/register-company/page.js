@@ -35,7 +35,7 @@ export default function RegisterCompany() {
         
     ];
 
-    return <AuthForm title="Registro de Empresa" message="Crea una cuenta para empezar a promocionar tu empresa." fields={registerComapnyFields} onSubmit={handleRegisterCompany}>
+    return <AuthForm title="Registro de Empresa" message="Crea una cuenta para empezar a promocionar tu empresa." fields={registerComapnyFields} onSubmit={handleRegisterCompany} textButton="SOLICITAR REGISTRO">
 
     </AuthForm> 
 }

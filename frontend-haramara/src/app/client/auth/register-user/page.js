@@ -11,5 +11,5 @@ export default function RegisterUser() {
         { name: "password2", type: "password", placeholder: "Repite tu contraseña", label: "Repite tu contraseña" }
     ];
 
-    return <AuthForm title="Registro de Usuario" message="Crea una cuenta personal." fields={loginFields} onSubmit={handleRegisterUser} />
+    return <AuthForm title="Registro de Usuario" message="Crea una cuenta personal." fields={loginFields} onSubmit={handleRegisterUser} textButton="REGISTRAR CUENTA" />
 }

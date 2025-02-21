@@ -4,8 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import HaramaraButton from './HaramaraButton';
 import styles from './NavBar.module.css';
+import { useUser } from '@/app/UserContext';
+import ProfileCard from './ProfileCard';
 
 const NavBar = () => {
+  const {user, userType, loading} = useUser();
 
   return (
     <nav className={styles.navbar}>
@@ -41,15 +44,25 @@ const NavBar = () => {
             </Link>
           </div>
 
-          {/* Auth Buttons */}
-          <div className={styles.authButtons}>
-            <Link href="/client/auth/login">
-            <HaramaraButton variant="primary">INICIAR SESIÓN</HaramaraButton>
-            </Link>
-            <Link href="/client/auth/register-user">
-            <HaramaraButton variant="primary">REGISTRARSE</HaramaraButton>
-            </Link>
-          </div>
+          {
+          userType === "user" && !loading ? (
+            <div className={styles.options}>
+              <HaramaraButton variant="primary">CERRAR SESIÓN</HaramaraButton>
+              <ProfileCard urlImage={user?.url_iamge} name={user?.username} role={userType} />
+            </div>
+          ) : (
+              // Auth Buttons
+            <div className={styles.authButtons}>
+              <Link href="/client/auth/login">
+                <HaramaraButton variant="primary">INICIAR SESIÓN</HaramaraButton>
+              </Link>
+              <Link href="/client/auth/register-user">
+                <HaramaraButton variant="primary">REGISTRARSE</HaramaraButton>
+              </Link>
+            </div>
+
+          )
+          }
 
           {/* Mobile menu button */}
           <button className={styles.mobileMenuButton}>
