@@ -3,10 +3,14 @@ import AuthForm from "@/components/AuthForm";
 import { useAuth } from "../AuthContext";
 import { useState, useEffect } from "react";
 import { handleLoginEspecific } from "../utils";
+import { useUser } from "@/app/UserContext";
+import { useRouter } from "next/navigation";
 
 
 export default function Login() {
+    const router = useRouter();
     const {selected, setSelected, formData, setFormData} = useAuth();
+    const {user, setUser, userType, setUserType} = useUser();
     const [title, setTitle] = useState("");
 
     useEffect(() => {
@@ -27,8 +31,8 @@ export default function Login() {
     const handleLogin = async (data) => {
         data.type = selected;
         console.log("data", data);
-        handleLoginEspecific(data, formData, setFormData);
+        handleLoginEspecific(data, formData, setFormData, setUser, setUserType, router);
     };
 
-    return <AuthForm title={`Inicia sesión${title}`} message="Ingresa tus credenciales para acceder a tu cuenta." fields={loginFields} onSubmit={handleLogin} />;
+    return <AuthForm title={`Inicia sesión${title}`} message="Ingresa tus credenciales para acceder a tu cuenta." fields={loginFields} onSubmit={handleLogin} textButton="INICIAR SESIÓN" />
 }

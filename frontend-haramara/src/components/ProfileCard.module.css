@@ -1,0 +1,34 @@
+.profileContainer{
+    margin-left: 1rem;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.profileInfo{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin-left: 1rem;
+}
+
+.profileName{
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.profileRole{
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.profileImage{
+    width: 50px;
+    height: 50px;
+    border-radius: 7%;
+}

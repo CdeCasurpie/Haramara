@@ -3,7 +3,7 @@ import HaramaraButton from "./HaramaraButton";
 import styles from "./AuthForm.module.css";
 import { useAuth } from "@/app/client/auth/AuthContext";
 
-export default function AuthForm({ title, message, fields, onSubmit, children }) {
+export default function AuthForm({ title, message, fields, onSubmit, textButton, children }) {
     const {formData, setFormData} = useAuth();
     console.log("formData", formData);
 
@@ -63,7 +63,7 @@ export default function AuthForm({ title, message, fields, onSubmit, children })
 
             <div className={styles.separator}>
                 <HaramaraButton variant="principal" type="submit">
-                    INICIAR SESIÓN
+                    {textButton || "Enviar"}
                 </HaramaraButton>
             </div>
         </form>
