@@ -1,5 +1,6 @@
 from flask_jwt_extended import create_access_token
-from app.models import Users, Companies, Locations, db
+from app.models import db
+from app.models import Users, Companies, Locations, TemporalCompanies, TemporalLocations
 
 def get_post_data(request, required_fields=None):
     """
@@ -55,6 +56,7 @@ def search_company(email):
     company = Companies.query.filter_by(email=email).first()
     return company
 
+
 def search_location(new_location):
     """
     Busca una ubicacion en la base de datos
@@ -66,10 +68,8 @@ def generate_token(user_id, type):
     """
     Genera un token
     """
-    payload = {
-        'user_id': user_id,
-        'type': type
-    }
-
-    return create_access_token(identity=payload)
+    return create_access_token(
+        identity=str(user_id), 
+        additional_claims={'type': type}
+    )
 

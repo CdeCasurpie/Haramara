@@ -1,10 +1,12 @@
-import React from 'react';
+"use client";
+import React, { use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import HaramaraButton from './HaramaraButton';
 import styles from './NavBar.module.css';
 
 const NavBar = () => {
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
@@ -41,8 +43,12 @@ const NavBar = () => {
 
           {/* Auth Buttons */}
           <div className={styles.authButtons}>
+            <Link href="/client/auth/login">
             <HaramaraButton variant="primary">INICIAR SESIÓN</HaramaraButton>
+            </Link>
+            <Link href="/client/auth/register-user">
             <HaramaraButton variant="primary">REGISTRARSE</HaramaraButton>
+            </Link>
           </div>
 
           {/* Mobile menu button */}

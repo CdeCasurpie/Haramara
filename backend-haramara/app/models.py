@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    username = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     url_image = db.Column(db.String(120), nullable=True)
     password = db.Column(db.String(120), nullable=False)
@@ -28,7 +28,8 @@ class Users(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-class Locations(db.Model):
+class BaseLocations(db.Model):
+    __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     address = db.Column(db.String(120), nullable=False)
     country = db.Column(db.String(120), nullable=False)
@@ -44,12 +45,18 @@ class Locations(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-class Companies(db.Model):
+class Locations(BaseLocations):
+    __tablename__ = 'locations'
+
+class TemporalLocations(BaseLocations):
+    __tablename__ = 'temporal_locations'
+
+class BaseCompanies(db.Model):
+    __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    id_location = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
     url_image_logo = db.Column(db.String(120), nullable=True)
     url_image_portada = db.Column(db.String(120), nullable=True)
     name_representative = db.Column(db.String(80), nullable=False)
@@ -82,6 +89,14 @@ class Companies(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+class Companies(BaseCompanies):
+    __tablename__ = 'companies'
+    id_location = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+    
+class TemporalCompanies(BaseCompanies):
+    __tablename__ = 'temporal_companies'
+    id_location = db.Column(db.Integer, db.ForeignKey('temporal_locations.id'), nullable=False)
 
 
 class Services(db.Model):
