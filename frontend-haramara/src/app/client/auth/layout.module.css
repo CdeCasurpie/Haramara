@@ -8,8 +8,13 @@
     background-color: white;
     width: 100%;
     flex-grow: 1;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
-
+.container::-webkit-scrollbar {
+    display: none; /* Ocultar scrollbar en navegadores WebKit */
+}
 .toggle-container {
     display: flex;
     border-radius: 10px;

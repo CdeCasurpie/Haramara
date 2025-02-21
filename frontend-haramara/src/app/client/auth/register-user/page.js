@@ -3,6 +3,7 @@ import AuthForm from "@/components/AuthForm";
 import { handleRegisterUser } from "../utils";
 
 export default function RegisterUser() {
+
     const loginFields = [
         { name: "username", type: "text", placeholder: "Nombre", label: "Nombre" },
         { name: "email", type: "email", placeholder: "Correo", label: "Correo" },

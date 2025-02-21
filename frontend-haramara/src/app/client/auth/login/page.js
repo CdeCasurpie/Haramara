@@ -6,7 +6,7 @@ import { handleLoginEspecific } from "../utils";
 
 
 export default function Login() {
-    const {selected, setSelected} = useAuth();
+    const {selected, setSelected, formData, setFormData} = useAuth();
     const [title, setTitle] = useState("");
 
     useEffect(() => {
@@ -27,7 +27,7 @@ export default function Login() {
     const handleLogin = async (data) => {
         data.type = selected;
         console.log("data", data);
-        handleLoginEspecific(data);
+        handleLoginEspecific(data, formData, setFormData);
     };
 
     return <AuthForm title={`Inicia sesión${title}`} message="Ingresa tus credenciales para acceder a tu cuenta." fields={loginFields} onSubmit={handleLogin} />;

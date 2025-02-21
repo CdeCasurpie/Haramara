@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import HaramaraButton from "./HaramaraButton";
 import styles from "./AuthForm.module.css";
+import { useAuth } from "@/app/client/auth/AuthContext";
 
 export default function AuthForm({ title, message, fields, onSubmit, children }) {
-    const [formData, setFormData] = useState({});
+    const {formData, setFormData} = useAuth();
+    console.log("formData", formData);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -11,7 +13,7 @@ export default function AuthForm({ title, message, fields, onSubmit, children })
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(formData);
+        onSubmit(formData, setFormData);
     };
 
     return (
@@ -46,6 +48,7 @@ export default function AuthForm({ title, message, fields, onSubmit, children })
                             <input
                                 type={field.type}
                                 name={field.name}
+                                value={formData[field.name] || ""}
                                 placeholder={field.placeholder}
                                 className={styles.input}
                                 onChange={handleChange}

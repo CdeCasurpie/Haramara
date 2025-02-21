@@ -12,8 +12,6 @@ export default function ClientAuthLayout({ children}) {
     const [selected, setSelected] = useState("user");
     const [typeForm, setTypeForm] = useState("null");
     const [formData, setFormData] = useState({
-        email: "",
-        password: ""
     });
 
     useEffect(() => {
