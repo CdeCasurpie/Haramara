@@ -2,7 +2,7 @@
 from app.auth import auth_bp
 from app.auth.utils import *
 from flask import jsonify, request
-from flask_jwt_extended import set_access_cookies
+from flask_jwt_extended import set_access_cookies, jwt_required, get_jwt_identity, get_jwt
 
 @auth_bp.route('/auth')
 def auth():
@@ -47,7 +47,8 @@ def login():
         }
     })
 
-    set_access_cookies(response, token)
+    set_access_cookies(response, token, max_age=timedelta(days=1))
+    #response.headers["Access-Control-Allow-Credentials"] = "true"  
 
     return response, 200
 
@@ -151,6 +152,24 @@ def register_company():
         except Exception as e:
             db.session.rollback()  # Revierte cambios en caso de error
             return jsonify({'success': False, 'message': 'error creating temporal company: ' + str(e)}), 500
+
+
+@auth_bp.route('/auth/me', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    """
+    Obtiene la información del usuario autenticado
+    """
+    id = get_jwt_identity()
+    claims = get_jwt()
+    user_type = claims['type']
+
+    if user_type == 'user':
+        user = Users.query.get(id)
+        return jsonify({'id': id, 'username': user.username, 'email': user.email, 'url_image':user.url_image, 'type': claims['type']}), 200
+    else:
+        company = Companies.query.get(id)
+        return jsonify({'id': id, 'name': company.name, 'email': company.email, 'url_image':company.url_image, 'type': claims['type']}), 200
 
 
 """

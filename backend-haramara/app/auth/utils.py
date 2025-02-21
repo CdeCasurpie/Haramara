@@ -1,6 +1,7 @@
 from flask_jwt_extended import create_access_token
 from app.models import db
 from app.models import Users, Companies, Locations, TemporalCompanies, TemporalLocations
+from datetime import timedelta
 
 def get_post_data(request, required_fields=None):
     """
@@ -66,10 +67,10 @@ def search_location(new_location):
 
 def generate_token(user_id, type):
     """
-    Genera un token
+    Genera un token que expira en 1 día
     """
     return create_access_token(
         identity=str(user_id), 
-        additional_claims={'type': type}
+        additional_claims={'type': type},
+        expires_delta=timedelta(days=1)  # Token expira en 1 día
     )
-
