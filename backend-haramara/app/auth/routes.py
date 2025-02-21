@@ -2,6 +2,7 @@
 from app.auth import auth_bp
 from app.auth.utils import *
 from flask import jsonify, request
+from flask_jwt_extended import set_access_cookies
 
 @auth_bp.route('/auth')
 def auth():
@@ -25,7 +26,7 @@ def login():
     if data['type'] not in ['user', 'company']:
         return jsonify({'success': False, 'message': 'invalid type'}), 400
     
-    entity = search_user(data['email']) if data['type'] == 'user' else search_company(data['email'], data['password'])
+    entity = search_user(data['email']) if data['type'] == 'user' else search_company(data['email'])
 
     if not entity or entity.id == None:
         return jsonify({'success': False, 'message': 'user or company not found'}), 404
@@ -37,15 +38,18 @@ def login():
     token = generate_token(entity.id, data['type'])
 
     # returns token and user data
-    return jsonify({
+    response = jsonify({
         'success': True,
-        'token': token,
         'user': {
             'id': entity.id,
             'email': entity.email,
             'type': data['type']
         }
-    }), 200
+    })
+
+    set_access_cookies(response, token)
+
+    return response, 200
 
 
 @auth_bp.route('/auth/logout', methods=['POST'])
@@ -90,10 +94,10 @@ def register_user():
         return jsonify({'success': False, 'message': 'error creating user: ' + str(e)}), 500
 
 
-@auth_bp.route('/auth/register/company', methods=['POST'])
+@auth_bp.route('/auth/register/company/temporal', methods=['POST'])
 def register_company():
     """
-    Registra una empresa
+    Registra una empresa temporal y su ubicacion temporal
     """
     data, missing = get_post_data(request, ['name', 'email', 'password', 'name_representative', 'last_name_representative', "is_safe", "has_languages",  'address', 'country', 'comunity', 'province', 'postal_code'])
 
@@ -114,7 +118,7 @@ def register_company():
             return jsonify({'success': False, 'message': 'company name already exists'}), 409
 
         #creamos nueva ubicacion
-        new_location = Locations(address=data['address'], country=data['country'], comunity=data['comunity'], province=data['province'], postal_code=data['postal_code'])
+        new_location = TemporalLocations(address=data['address'], country=data['country'], comunity=data['comunity'], province=data['province'], postal_code=data['postal_code'])
         
         #verificamos si la ubicacion ya existe
         if search_location(new_location):
@@ -122,17 +126,10 @@ def register_company():
         
         # Creamos una compañía dentro de una sesión
         try:
-            new_location = Locations(
-                address=data['address'], 
-                country=data['country'], 
-                comunity=data['comunity'], 
-                province=data['province'], 
-                postal_code=data['postal_code']
-            )
             db.session.add(new_location) 
             db.session.flush() 
 
-            new_company = Companies(
+            new_company = TemporalCompanies(
                 name=data['name'], 
                 email=data['email'], 
                 password=data['password'], 
@@ -145,7 +142,7 @@ def register_company():
             db.session.add(new_company)
             db.session.flush()
 
-            return jsonify({'success': True, 'message': 'company created successfully', 'data': {
+            return jsonify({'success': True, 'message': 'temporal company created successfully', 'data': {
                 'id': new_company.id,
                 'name': new_company.name,
                 'email': new_company.email
@@ -153,4 +150,12 @@ def register_company():
 
         except Exception as e:
             db.session.rollback()  # Revierte cambios en caso de error
-            return jsonify({'success': False, 'message': 'error creating company: ' + str(e)}), 500
+            return jsonify({'success': False, 'message': 'error creating temporal company: ' + str(e)}), 500
+
+
+"""
+Ruta para confirmar el registro de una empresa
+
+@app.route('/auth/register/company/<int:company_id>/location/<int:location_id>', methods=['POST'])
+def confirm_register_company():
+"""
