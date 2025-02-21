@@ -10,11 +10,9 @@
     bottom: 0;
     box-shadow: 0 0 10px rgba(0,0,0,.18);
 }
-  .menuContainer {
-  }
   
   .menuTitle {
-        font-size: 1.125rem;
+        font-size: 1.2rem;
         font-weight: 600;
         color: #1f2937;
         padding: 2rem 0 0.5rem 2rem;
@@ -54,7 +52,7 @@
   
   .menuText {
     margin-left: 0.75rem;
-    font-size: 0.875rem;
+    font-size:1.1rem;
   }
   
   .logoutContainer {

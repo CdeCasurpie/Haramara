@@ -4,10 +4,10 @@ import styles from './BusinessSideBar.module.css';
 
 const BusinessSideBar = () => {
   const menuItems = [
-    { icon: <User size={20} />, text: 'Mis Datos' },
-    { icon: <Activity size={20} />, text: 'Mis pedidos' },
-    { icon: <Calendar size={20} />, text: 'Mis reservas' },
-    { icon: <Bell size={20} />, text: 'Seguidos' },
+    { icon: <User size={22} color='var(--text-color)'/>, text: 'Mis Datos' },
+    { icon: <Activity size={22} color='var(--text-color)'/>, text: 'Mis pedidos' },
+    { icon: <Calendar size={22} color='var(--text-color)'/>, text: 'Mis reservas' },
+    { icon: <Bell size={22} color='var(--text-color)' />, text: 'Seguidos' },
   ];
 
   return (
