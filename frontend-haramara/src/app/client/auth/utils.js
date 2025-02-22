@@ -1,7 +1,7 @@
 import API_BASE_URL  from "@/config";
 
 
-export const handleRegisterUser = async (formData, setFormData) => {
+export const handleRegisterUser = async (formData, setFormData, setUser, setUserType, router) => {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/register/user`, {
             method: "POST",
@@ -17,10 +17,14 @@ export const handleRegisterUser = async (formData, setFormData) => {
         if (response.status === 201) {
             console.log("Usuario registrado", result);
             // loguearse automaticamente
-            handleLoginEspecific({email: formData.email, password: formData.password, type: "user"}, formData, setFormData);
+            const dataNew = {email: formData.email, password: formData.password, type: "user"};
+
+            handleLoginEspecific(dataNew, formData, setFormData, setUser, setUserType, router);
+            
             setFormData(
                 {}
             )
+
         } else {
             console.error("Error registrando usuario", result);
             alert("Error registrando usuario");
@@ -61,9 +65,12 @@ export const handleRegisterCompany = async (formData, setFormData) => {
         if (response.status === 201) {
             console.log("Empresa registrada", result);
             alert("Empresa registrada");
+
+
             setFormData(
                 {}
             )
+
         } else {
             console.error("Error registrando empresa", result);
             alert("Error registrando empresa");
@@ -102,17 +109,19 @@ export const handleLoginEspecific = async (data, formData, setFormData, setUser,
             setUserType(complete_data.type);
 
             //redirigir a la página de inicio
+            console.log("jaj")
             router.push("/client");
+            console.log("holi")
             
 
         } else {
-            console.error("Error logeando usuario", result);
-            alert("Error logeando usuario");
+            console.error("Error logeando usuarioX", result);
+            alert("Error logeando usuarioX");
         }
 
     } catch(error){
-        console.error("Error logeando usuario", error);
-        alert("Error logeando usuario");
+        console.error("Error logeando usuarioY", error);
+        alert("Error logeando usuarioY");
     } 
 };
 

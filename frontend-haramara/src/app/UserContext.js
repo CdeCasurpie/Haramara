@@ -44,7 +44,7 @@ export const UserProvider = ({ children }) => {
             }
 
             const data = await response.json();
-            setUser(data["id"]);
+            setUser(data);
             setUserType(data["type"]);
         } catch (error) {
             console.error("Error obteniendo usuario:", error);
