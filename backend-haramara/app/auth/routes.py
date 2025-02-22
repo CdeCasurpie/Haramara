@@ -116,19 +116,22 @@ def register_company():
     
     with db.session.begin():
         existing_company = search_company(data['email'])
+        existing_temporal_company = TemporalCompanies.query.filter_by(email=data['email']).first()
 
-        if existing_company:
+        if existing_company or existing_temporal_company:
             return jsonify({'success': False, 'message': 'company already exists'}), 409
         
         #verificamos unicidad de nombre de empresa
-        if Companies.query.filter_by(name=data['name']).first():
+        if Companies.query.filter_by(name=data['name']).first() or TemporalCompanies.query.filter_by(name=data['name']).first():
             return jsonify({'success': False, 'message': 'company name already exists'}), 409
 
         #creamos nueva ubicacion
         new_location = TemporalLocations(address=data['address'], country=data['country'], comunity=data['comunity'], province=data['province'], postal_code=data['postal_code'])
         
         #verificamos si la ubicacion ya existe
-        if search_location(new_location):
+        existing_location = search_location(new_location)
+        existing_temporal_location = TemporalLocations.query.filter_by(address=data['address'], country=data['country'], comunity=data['comunity'], province=data['province'], postal_code=data['postal_code']).first()
+        if existing_location or existing_temporal_location:
             return jsonify({'success': False, 'message': 'location already exists'}), 409
         
         # Creamos una compañía dentro de una sesión

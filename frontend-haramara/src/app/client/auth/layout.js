@@ -39,7 +39,6 @@ export default function ClientAuthLayout({ children}) {
 
     // Redirigir cuando cambian selected
     useEffect(() => {
-        console.log("typeForm", typeForm, "selected", selected);
         if (typeForm !== "null") {
 
             let newPath;

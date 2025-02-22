@@ -13,13 +13,10 @@ export const handleRegisterUser = async (formData, setFormData, setUser, setUser
         });
 
         const result = await response.json();
-
         if (response.status === 201) {
-            console.log("Usuario registrado", result);
-            // loguearse automaticamente
-            const dataNew = {email: formData.email, password: formData.password, type: "user"};
 
-            handleLoginEspecific(dataNew, formData, setFormData, setUser, setUserType, router);
+            const dataNew = {email: formData.email, password: formData.password, type: "user"};
+            handleLoginEspecific(dataNew, setFormData, setUser, setUserType, router, setErrors, setSuccess);
             
             setFormData(
                 {}
@@ -30,7 +27,7 @@ export const handleRegisterUser = async (formData, setFormData, setUser, setUser
                 setSuccess(false);
             }, 5000);
         } else {
-            if (result.success === false) {
+            if (!result.success) {
                 let errors = [result.message];
 
                 if (result.missing) {
@@ -48,7 +45,7 @@ export const handleRegisterUser = async (formData, setFormData, setUser, setUser
     } 
 };
 
-export const handleRegisterCompany = async (formData, setFormData) => {  
+export const handleRegisterCompany = async (formData, setFormData, setUser, setUserType, router, setErrors, setSuccess) => {
     if(formData.has_languages === "si"){
         formData.has_languages = true;
     }else{
@@ -78,16 +75,30 @@ export const handleRegisterCompany = async (formData, setFormData) => {
             setFormData(
                 {}
             )
+            setSuccess(true);
+            setTimeout(() => {
+                setSuccess(false);
+            }, 5000);
 
         } else {
-        }
+            if (!result.success) {
+                let errors = [result.message];
 
+                if (result.missing) {
+                    for (const field of result.missing) {
+                        errors.push(`El campo ${field} es requerido`);
+                    }
+                }
+                setSuccess(false);
+                setErrors(errors);
+            }
+        }
     } catch(error){
+        console.error("Error registrando empresa", error);
     }  
 };
-export const handleLoginEspecific = async (data, formData, setFormData, setUser, setUserType, router) => {
+export const handleLoginEspecific = async (formData, setFormData, setUser, setUserType, router, setErrors, setSuccess) => {
     try {
-        //console.log("data amarilla", data);
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: "POST",
             headers: {
@@ -95,28 +106,38 @@ export const handleLoginEspecific = async (data, formData, setFormData, setUser,
             },
             mode: "cors",
             credentials: "include",
-            body: JSON.stringify(data),
+            body: JSON.stringify(formData),
         });
 
         const result = await response.json();
-
         if (response.status === 200) {
             setFormData(
                 {}
             )
+
             const complete_data = await handleCurrentUser();
-            console.log("todos me odian")
-            console.log("complete_data", complete_data);
+
             setUser(complete_data);
             setUserType(complete_data.type);
 
-            //redirigir a la página de inicio
-            console.log("jaj")
             router.push("/client");
-            console.log("holi")
-            
 
+            setSuccess(true);
+            setTimeout(() => {
+                setSuccess(false);
+            }, 5000);
         } else {
+            if (!result.success) {
+                let errors = [result.message];
+
+                if (result.missing) {
+                    for (const field of result.missing) {
+                        errors.push(`El campo ${field} es requerido`);
+                    }
+                }
+                setSuccess(false);
+                setErrors(errors);
+            }
         }
 
     } catch(error){
@@ -139,10 +160,8 @@ const handleCurrentUser = async () => {
         const result = await response.json();
 
         if (response.status === 200) {
-            console.log("Usuario actual", result);
             return result;
         } else {
-            console.log("Error obteniendo usuario actual", result);
             console.error("Error obteniendo usuario actual", result);
         }
 
@@ -164,7 +183,6 @@ export const handleLogout = async (setUser, setUserType, router) => {
         mode: "cors",
         credentials: "include",
     }).then(() => {
-        console.log("Usuario deslogeado");
         window.location.href = "/client";
     })
 }

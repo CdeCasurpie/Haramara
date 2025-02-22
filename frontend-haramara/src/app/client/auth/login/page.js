@@ -12,27 +12,22 @@ export default function Login() {
     const {selected, setSelected, formData, setFormData} = useAuth();
     const {user, setUser, userType, setUserType} = useUser();
     const [title, setTitle] = useState("");
+    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         if (selected === "user") {
             setTitle("");
+            setFormData({...formData, type: "user"});
         } else if (selected === "company") {
             setTitle(" empresarial");
+            setFormData({...formData, type: "company"});
         }
     }, [selected]);
 
-    console.log("selected", selected);
     const loginFields = [   
         { name: "email", type: "email", placeholder: "example@gmail.com", label: "Correo electrónico:" },
         { name: "password", type: "password", placeholder: "contraseña", label: "Contraseña:" },
     ];
 
-
-    const handleLogin = async (data) => {
-        data.type = selected;
-        console.log("data", data);
-        handleLoginEspecific(data, formData, setFormData, setUser, setUserType, router);
-    };
-
-    return <AuthForm title={`Inicia sesión${title}`} message="Ingresa tus credenciales para acceder a tu cuenta." fields={loginFields} onSubmit={handleLogin} textButton="INICIAR SESIÓN" />
+    return <AuthForm title={`Inicia sesión${title}`} message="Ingresa tus credenciales para acceder a tu cuenta." fields={loginFields} onSubmit={handleLoginEspecific} textButton="INICIAR SESIÓN" success={success} setSuccess={setSuccess} />;
 }

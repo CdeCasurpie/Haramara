@@ -1,8 +1,10 @@
 'use client';
 import AuthForm from "@/components/AuthForm";
 import { handleRegisterCompany } from "../utils";
+import { useState } from "react";
 
 export default function RegisterCompany() {
+    const [success, setSuccess] = useState(false);
     const registerComapnyFields = [
         { name: "name", type: "text", placeholder: "Nombre de la empresa", label: "Nombre de la empresa:" },
         { name: "email", type: "email", placeholder: "example@gmail.com", label: "Correo electrónico:" },
@@ -35,7 +37,7 @@ export default function RegisterCompany() {
         
     ];
 
-    return <AuthForm title="Registro de Empresa" message="Crea una cuenta para empezar a promocionar tu empresa." fields={registerComapnyFields} onSubmit={handleRegisterCompany} textButton="SOLICITAR REGISTRO">
+    return <AuthForm title="Registro de Empresa" message="Crea una cuenta para empezar a promocionar tu empresa." fields={registerComapnyFields} onSubmit={handleRegisterCompany} textButton="SOLICITAR REGISTRO" success={success} setSuccess={setSuccess}>
 
     </AuthForm> 
 }

@@ -17,7 +17,7 @@ const NavBar = () => {
         <div className={styles.content}>
           {/* Logo */}
           <div className={styles.logo}>
-            <Link href="/" className={styles.logoLink}>
+            <Link href="/client" className={styles.logoLink}>
               <Image
                 src="/icons/logos/haramara.svg"
                 alt="Haramara logo"
@@ -46,27 +46,34 @@ const NavBar = () => {
           </div>
 
           {
-          userType === "user" && !loading ? (
-            <div className={styles.options}>
-              <ProfileCard urlImage={user?.url_iamge} name={user?.username} role={userType} />
-              <HaramaraButton variant="primary"
-                onClick={() => handleLogout(setUser, setUserType, setLoading)}
-              >CERRAR SESIÓN</HaramaraButton>
-            </div>
-          ) : (
-              // Auth Buttons
-            <div className={styles.authButtons}>
-              <Link href="/client/auth/login">
-                <HaramaraButton variant="primary">INICIAR SESIÓN</HaramaraButton>
-              </Link>
-              <Link href="/client/auth/register-user">
-                <HaramaraButton variant="primary">REGISTRARSE</HaramaraButton>
-              </Link>
-            </div>
-
-          )
+            loading ? (
+              <></>
+            ) : userType === "user" ? (
+              <div className={styles.options}>
+                <ProfileCard 
+                  urlImage={user?.url_image} 
+                  name={user?.username} 
+                  role={userType} 
+                />
+                <HaramaraButton 
+                  variant="primary"
+                  onClick={() => handleLogout(setUser, setUserType, setLoading)}
+                >
+                  CERRAR SESIÓN
+                </HaramaraButton>
+              </div>
+            ) : (
+              <div className={styles.authButtons}>
+                <Link href="/client/auth/login">
+                  <HaramaraButton variant="primary">INICIAR SESIÓN</HaramaraButton>
+                </Link>
+                <Link href="/client/auth/register-user">
+                  <HaramaraButton variant="primary">REGISTRARSE</HaramaraButton>
+                </Link>
+              </div>
+            )
           }
-
+          
           {/* Mobile menu button */}
           <button className={styles.mobileMenuButton}>
             <svg
