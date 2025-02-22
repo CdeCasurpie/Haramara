@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import HaramaraButton from "./HaramaraButton";
 import styles from "./AuthForm.module.css";
 import { useAuth } from "@/app/client/auth/AuthContext";
+import { useUser } from "@/app/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function AuthForm({
   title,
@@ -13,8 +15,11 @@ export default function AuthForm({
   success,
   setSuccess,
 }) {
-  const { formData, setFormData } = useAuth();
-  const [errors, setErrors] = useState([]);
+
+    const router = useRouter();
+    const {setUser,setUserType} = useUser();
+    const { formData, setFormData } = useAuth();
+    const [errors, setErrors] = useState([]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,7 +28,7 @@ export default function AuthForm({
   const handleSubmit = async (e) => {
     setErrors([]);
     e.preventDefault();
-    await onSubmit(formData, setFormData, setErrors, setSuccess);
+    await onSubmit(formData, setFormData, setUser, setUserType, router, setErrors, setSuccess);
   };
 
   return (

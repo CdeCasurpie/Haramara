@@ -1,6 +1,10 @@
 "use client";
 import AuthForm from "@/components/AuthForm";
 import { handleRegisterUser } from "../utils";
+import { useUser } from "@/app/UserContext";
+import { useAuth } from "../AuthContext";
+import { useRouter } from "next/navigation";
+
 import { useState } from "react";
 
 export default function RegisterUser() {

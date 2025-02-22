@@ -1,7 +1,7 @@
 import API_BASE_URL  from "@/config";
 
 
-export const handleRegisterUser = async (formData, setFormData, setErrors, setSuccess) => {
+export const handleRegisterUser = async (formData, setFormData, setUser, setUserType, router, setErrors, setSuccess) => {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/register/user`, {
             method: "POST",
@@ -17,7 +17,10 @@ export const handleRegisterUser = async (formData, setFormData, setErrors, setSu
         if (response.status === 201) {
             console.log("Usuario registrado", result);
             // loguearse automaticamente
-            handleLoginEspecific({email: formData.email, password: formData.password, type: "user"}, formData, setFormData);
+            const dataNew = {email: formData.email, password: formData.password, type: "user"};
+
+            handleLoginEspecific(dataNew, formData, setFormData, setUser, setUserType, router);
+            
             setFormData(
                 {}
             )
@@ -75,6 +78,7 @@ export const handleRegisterCompany = async (formData, setFormData) => {
             setFormData(
                 {}
             )
+
         } else {
         }
 
@@ -107,7 +111,9 @@ export const handleLoginEspecific = async (data, formData, setFormData, setUser,
             setUserType(complete_data.type);
 
             //redirigir a la página de inicio
+            console.log("jaj")
             router.push("/client");
+            console.log("holi")
             
 
         } else {
