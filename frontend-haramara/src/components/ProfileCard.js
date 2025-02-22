@@ -2,7 +2,7 @@ import styles from './ProfileCard.module.css';
 
 export default function ProfileCard({ urlImage, name, role }) {
     if (!urlImage){
-        urlImage = '/images/profile.png';
+        urlImage = '/images/general/profile_default.svg';
     }
     return (
         <div className={styles.profileContainer}>

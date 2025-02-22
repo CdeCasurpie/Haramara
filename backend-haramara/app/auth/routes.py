@@ -3,7 +3,6 @@ from app.auth import auth_bp
 from app.auth.utils import *
 from flask import jsonify, request
 from flask_jwt_extended import set_access_cookies, jwt_required, get_jwt_identity, get_jwt
-
 @auth_bp.route('/auth')
 def auth():
     return 'Auth! Hello from auth_bp'
@@ -47,7 +46,7 @@ def login():
         }
     })
 
-    set_access_cookies(response, token, max_age=timedelta(days=1))
+    set_access_cookies(response, token, max_age=timedelta(days=256))
     #response.headers["Access-Control-Allow-Credentials"] = "true"  
 
     return response, 200
@@ -58,17 +57,24 @@ def logout():
     """
     Deslogea un usuario
     """
-    return jsonify({'message': 'not implemented yet'}), 501
+    response = jsonify({'success': True})
+    set_access_cookies(response, '', max_age=0)
+    
+    return response, 200
 
 @auth_bp.route('/auth/register/user', methods=['POST'])
 def register_user():
     """
     Registra un usuario
     """
-    data, missing = get_post_data(request, ['username', 'email', 'password'])
+    data, missing = get_post_data(request, ['username', 'email', 'password', "password2"])
 
     if not data:
         return jsonify({'success': False, 'message': 'missing fields', 'missing': missing}), 400
+    
+    # verificar contraseñas iguales
+    if data['password'] != request.json['password2']:
+        return jsonify({'success': False, 'message': 'passwords do not match'}), 400
     
     if not is_valid_email(data['email']): 
         return jsonify({'success': False, 'message': 'invalid email'}), 400

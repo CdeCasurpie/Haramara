@@ -30,6 +30,35 @@
     width: 100%;
 }
 
+.error {
+    padding: 12px 16px;
+    width: 100%;
+    border-radius: 6px;
+    background-color: rgba(255, 0, 0, 0.1);
+    color: rgb(150, 0, 0);
+    font-size: 0.8rem;
+    font-family: 'inter', sans-serif;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    animation: fadeOut 0.5s ease;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.errors {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
 .label{
     display: flex;
     flex-direction: column;
@@ -68,6 +97,10 @@
 
 .separator{
     margin-top: 1rem;
+    width: 100%;
+}
+
+.separator * {
     width: 100%;
 }
 

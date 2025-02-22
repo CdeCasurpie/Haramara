@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
+import API_BASE_URL from "@/config";
 
 const UserContext = createContext(null);
 
@@ -31,7 +32,7 @@ export const UserProvider = ({ children }) => {
 
     const fetchUserData = async () => {
         try {
-            const response = await fetch("/auth/me", {
+            const response = await fetch(`${API_BASE_URL}/auth/me`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -44,7 +45,7 @@ export const UserProvider = ({ children }) => {
             }
 
             const data = await response.json();
-            setUser(data["id"]);
+            setUser(data);
             setUserType(data["type"]);
         } catch (error) {
             console.error("Error obteniendo usuario:", error);

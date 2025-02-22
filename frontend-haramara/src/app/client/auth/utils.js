@@ -1,7 +1,7 @@
 import API_BASE_URL  from "@/config";
 
 
-export const handleRegisterUser = async (formData, setFormData) => {
+export const handleRegisterUser = async (formData, setFormData, setErrors, setSuccess) => {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/register/user`, {
             method: "POST",
@@ -21,14 +21,27 @@ export const handleRegisterUser = async (formData, setFormData) => {
             setFormData(
                 {}
             )
+
+            setSuccess(true);
+            setTimeout(() => {
+                setSuccess(false);
+            }, 5000);
         } else {
-            console.error("Error registrando usuario", result);
-            alert("Error registrando usuario");
+            if (result.success === false) {
+                let errors = [result.message];
+
+                if (result.missing) {
+                    for (const field of result.missing) {
+                        errors.push(`El campo ${field} es requerido`);
+                    }
+                }
+                setSuccess(false);
+                setErrors(errors);
+            }
         }
 
     } catch(error){
         console.error("Error registrando usuario", error);
-        alert("Error registrando usuario");
     } 
 };
 
@@ -59,24 +72,18 @@ export const handleRegisterCompany = async (formData, setFormData) => {
         const result = await response.json();
 
         if (response.status === 201) {
-            console.log("Empresa registrada", result);
-            alert("Empresa registrada");
             setFormData(
                 {}
             )
         } else {
-            console.error("Error registrando empresa", result);
-            alert("Error registrando empresa");
         }
 
     } catch(error){
-        console.error("Error registrando empresa", error);
-        alert("Error registrando empresa");
     }  
 };
 export const handleLoginEspecific = async (data, formData, setFormData, setUser, setUserType, router) => {
     try {
-        console.log("data amarilla", data);
+        //console.log("data amarilla", data);
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: "POST",
             headers: {
@@ -90,8 +97,6 @@ export const handleLoginEspecific = async (data, formData, setFormData, setUser,
         const result = await response.json();
 
         if (response.status === 200) {
-            console.log("Usuario logeado", result);
-            alert("Usuario logeado");
             setFormData(
                 {}
             )
@@ -106,13 +111,10 @@ export const handleLoginEspecific = async (data, formData, setFormData, setUser,
             
 
         } else {
-            console.error("Error logeando usuario", result);
-            alert("Error logeando usuario");
         }
 
     } catch(error){
         console.error("Error logeando usuario", error);
-        alert("Error logeando usuario");
     } 
 };
 
@@ -144,3 +146,19 @@ const handleCurrentUser = async () => {
 }
 
 
+export const handleLogout = async (setUser, setUserType, router) => {
+    setUser(null);
+    setUserType(null);
+
+    fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "include",
+    }).then(() => {
+        console.log("Usuario deslogeado");
+        window.location.href = "/client";
+    })
+}

@@ -6,9 +6,10 @@ import HaramaraButton from './HaramaraButton';
 import styles from './NavBar.module.css';
 import { useUser } from '@/app/UserContext';
 import ProfileCard from './ProfileCard';
+import { handleLogout } from '@/app/client/auth/utils';
 
 const NavBar = () => {
-  const {user, userType, loading} = useUser();
+  const {user, userType, loading, setUser, setLoading, setUserType} = useUser();
 
   return (
     <nav className={styles.navbar}>
@@ -47,8 +48,10 @@ const NavBar = () => {
           {
           userType === "user" && !loading ? (
             <div className={styles.options}>
-              <HaramaraButton variant="primary">CERRAR SESIÓN</HaramaraButton>
               <ProfileCard urlImage={user?.url_iamge} name={user?.username} role={userType} />
+              <HaramaraButton variant="primary"
+                onClick={() => handleLogout(setUser, setUserType, setLoading)}
+              >CERRAR SESIÓN</HaramaraButton>
             </div>
           ) : (
               // Auth Buttons
