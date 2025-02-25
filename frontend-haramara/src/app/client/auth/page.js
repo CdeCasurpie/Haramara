@@ -41,6 +41,48 @@ export default function Formulario() {
       price: 100,
       stars: 4,    
     }} />
+    <CalendarSlider occupiedDays={occupiedDays} selectedDay={selectedDay} setSelectedDay={setSelectedDay} zonaHoraria="en-CA" />
+    {/*     id,
+    imagesList,
+    title,
+    location,
+    numReservations,
+    stars,
+    price,
+    onSubmit, */}
+    
+    <ActivityCard info={{
+      id: 1,
+      imagesList: imageList,
+      title: "Actividad de prueba",
+      location: "Cusquito",
+      numReservations: 10,
+      stars: 3.5,
+      price: 100,
+      onSubmit: () => console.log("reservar"),
+    }} />
+
+    {/*     id,
+    imageList,
+    title,
+    startDate,
+    endDate,
+    minAge,
+    level?,
+    location,
+    price, */}
+   
+    <CourseCard info={{
+      id: 1,
+      imagesList: [imageUrl],
+      title: "Curso de prueba",
+      startDate: "2025-02-24",
+      endDate: "2025-02-26",
+      minAge: 18,
+      level: "Intermedio",
+      location: "Cusquito",
+      price: 100,
+    }} />
     </>
 
   );
