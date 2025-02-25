@@ -1,0 +1,86 @@
+.banner {
+    position: relative;
+    width: 96%;
+    height: 300px; /* Ajusta la altura según lo necesites */
+    overflow: hidden;
+    border-radius: 7px;
+  }
+  
+  .imageContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 7px;
+    overflow: hidden;
+  }
+
+  .gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+    pointer-events: none;
+  }
+  
+  .content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10; /* Se asegura que esté por encima de la imagen */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 2rem; /* Ajusta el tamaño de fuente */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); /* Opcional: para mejorar la legibilidad sobre la imagen */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 15px;
+    align-items: flex-end;
+  }
+
+  .whiteIcon {
+    filter: invert(1) brightness(3) contrast(150%);
+    margin-right: 5px;
+  }
+  
+  .left {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .location {
+    display: flex;
+    flex-direction: row;
+    font-size: 1.3rem;
+  }
+
+  .details {
+    display: flex;
+    flex-direction: row;
+    font-size: 0.8rem;
+    align-items: flex-end;
+    margin-top: 5px;
+  }
+
+  .title {
+    font-size: 1.7rem;
+    margin-right: 15px;
+  }
+
+.right {
+    transform: scale(1.8); 
+    transform-origin: bottom right;
+}
+
+.stars {
+    margin-top: 10px;
+}

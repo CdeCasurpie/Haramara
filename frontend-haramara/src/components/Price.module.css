@@ -1,0 +1,27 @@
+.price{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.price .top{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 0.7rem;
+}
+
+.price .top p{
+    margin-right: 5px;
+}
+
+.price .top h1{
+    margin-left: 4px;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.price .bottom{
+    font-size: 0.55rem;
+}
