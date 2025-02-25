@@ -1,0 +1,9 @@
+.wrapMobile {
+    flex-wrap: nowrap;
+}
+
+@media (max-width: 1000px) {
+    .wrapMobile {
+        flex-wrap: wrap;
+    }
+}

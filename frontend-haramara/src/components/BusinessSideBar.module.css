@@ -1,7 +1,7 @@
 .sidebar {
     display: flex;
     flex-direction: column;
-    min-height: 92VH;
+    height: calc(100% - 40px);
     width: 100%;
     background-color: white;
     position: absolute;
@@ -22,7 +22,7 @@
   .menuNav {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1.2rem;
   }
   
   .menuItem {
@@ -37,7 +37,7 @@
     cursor: pointer;
     transition: background-color 0.2s;
     text-align: left;
-    padding: 1rem 0rem 1rem 2rem;
+    padding: 1rem 0rem 1rem 3rem;
   }
   
   .menuItem:hover {
@@ -53,6 +53,7 @@
   .menuText {
     margin-left: 0.75rem;
     font-size:1.1rem;
+    transition: color 0.2s;
   }
   
   .logoutContainer {
