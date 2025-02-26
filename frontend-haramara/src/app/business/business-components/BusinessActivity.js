@@ -4,10 +4,11 @@ import React from 'react';
 import styles from './BusinessActivity.module.css';
 
 const BusinessActivity = ({
-  image,
-  title,
+  image = "/images/general/placeholder_image.png",
+  title = "Insertar titulo de actividad",
   rating = 0,
-  onEdit
+  onEdit,
+  isEditing = false
 }) => {
   // Función para renderizar estrellas basado en la calificación
   const renderStars = (rating) => {
@@ -60,10 +61,10 @@ const BusinessActivity = ({
         </div>
         
         <button 
-          className={styles.editButton}
+          className={isEditing ? styles.editingButton : styles.editButton}
           onClick={() => onEdit()}
         >
-          Editar
+          {isEditing ? 'Editando' : 'Editar'}
         </button>
       </div>
     </div>

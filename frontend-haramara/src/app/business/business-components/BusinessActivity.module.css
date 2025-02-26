@@ -38,8 +38,8 @@
 .title {
     margin: 0 0 12px 0;
     font-size: 1.3rem;
-    font-weight: 600;
-    color: #0065c2;
+    font-weight: 500;
+    color: var(--primary-color);
 }
 
 .ratingContainer {
@@ -71,9 +71,9 @@
     right: 24px;
     padding: 8px 24px;
     background-color: transparent;
-    border: 1px solid #0065c2;
+    border: 1px solid var(--primary-color);
     border-radius: 6px;
-    color: #0065c2;
+    color: var(--primary-color);
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
@@ -81,8 +81,23 @@
 }
 
 .editButton:hover {
-    background-color: #0065c2;
+    background-color: var(--primary-color);
     color: white;
+}
+
+.editingButton{
+    position: absolute;
+    bottom: 20px;
+    right: 24px;
+    padding: 8px 24px;
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 @media (max-width: 768px) {

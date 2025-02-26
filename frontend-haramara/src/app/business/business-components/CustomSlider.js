@@ -7,7 +7,8 @@ const CustomSlider = ({
   title = 'Slider',
   itemHeight = 100, // Altura de cada item en píxeles
   gap = 16, // Espacio entre items en píxeles
-  maxHeight = 550 // Altura máxima opcional (si no se especifica, se usa la altura del contenedor)
+  maxHeight = 550, // Altura máxima opcional (si no se especifica, se usa la altura del contenedor)
+  showBorder = true
 }) => {
   const [visibleItems, setVisibleItems] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
@@ -76,7 +77,7 @@ const CustomSlider = ({
   };
 
   return (
-    <div className={styles.sliderContainer} ref={containerRef}>
+    <div className={styles.sliderContainer + (showBorder ? ` ${styles.border}` : '')} ref={containerRef}>
       {title && <h2 className={styles.title}>{title}</h2>}
       
       <div className={styles.sliderContent} ref={sliderRef}>

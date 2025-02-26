@@ -1,10 +1,8 @@
 .formContainer {
   display: flex;
   gap: 24px;
-  padding: 20px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .column {
@@ -170,10 +168,8 @@
 .formContainer {
   display: flex;
   gap: 24px;
-  padding: 20px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .column {
@@ -348,10 +344,8 @@
 .formContainer {
   display: flex;
   gap: 24px;
-  padding: 20px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .column {
@@ -582,10 +576,8 @@
 }
 
 .formContainer {
-  padding: 20px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 16px;
