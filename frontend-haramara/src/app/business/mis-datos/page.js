@@ -258,7 +258,7 @@ export default function MisDatos() {
                   >
                     Cancelar
                   </button>
-                )}
+                )}  
                 <button 
                   onClick={handleSave}
                   disabled={!isChanged}

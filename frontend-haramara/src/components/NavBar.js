@@ -40,7 +40,7 @@ const NavBar = () => {
             <Link href="/productos" className={styles.link}>
               Productos
             </Link>
-            <Link href="/vendedor" className={styles.link + ' ' + styles.seller}>
+            <Link href="/business" className={styles.link + ' ' + styles.seller}>
               ¿ERES UN VENDEDOR?
             </Link>
           </div>
