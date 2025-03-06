@@ -1,10 +1,11 @@
+import LocationPicker from "@/components/LocationPicker";
+import CourseForm from "../business-components/CourseForm";
 
 export default function Cursos() {
     return (
-        <>
-        <h1 style={{fontWeight: 500, fontSize: '1.5rem', color: 'var(--primary-color)', width: '100%', textAlign: 'center', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            Cursos Vista
-        </h1>
-        </>
+        <div style={{ width: "100%" }}>
+            {/* CourseForm */}
+            <LocationPicker />
+        </div>
     );
 }
