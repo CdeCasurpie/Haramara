@@ -4,9 +4,9 @@
 :root {
   /* Color Palette */
   --primary-color: #005CAD;      /* Azul principal profundo */
-  --secondary-color: #01D3E8;    /* Azul turquesa brillante */
+  --secondary-color: #0077c7;    /* Azul turquesa brillante */
   --primary-accent-color: #023859; /* Azul oscuro */
-  --ternary-color: #09DCE6;      /* Azul turquesa claro */
+  --ternary-color: #09DCE6;      /* Azul tu|rquesa claro */
   --complementary-color: #F7F7F7; /* Blanco grisáceo */
   --border-color: #E6E6E6;       /* Gris claro */
   --text-color: #000;            /* Gris oscuro */
@@ -22,6 +22,26 @@
     --foreground: var(--complementary-color);
   }
 }
+
+
+/* global webkit scrollbar */
+::-webkit-scrollbar {
+  width: 1px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}
+
+
 
 html,
 body {

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import styles from './ActivityForm.module.css';
+import LocationField from './LocationField';
 
 const ActivityForm = ({
   initialData = {
@@ -10,13 +11,12 @@ const ActivityForm = ({
     price_per_person: '',
     min_age: '15',
     initial_vacancies: '',
-    id_ubicacion: '',
+    location: null,
     tags: '',
     characteristics: [],
     images: []
   },
   setInitialData,
-  onSubmit,
   locations = []
 }) => {
   const [activity, setActivity] = useState(initialData);
@@ -35,6 +35,14 @@ const ActivityForm = ({
     setActivity({
       ...activity,
       [name]: value
+    });
+  };
+
+  // Manejar la selección de ubicación
+  const handleLocationSelect = (location) => {
+    setActivity({
+      ...activity,
+      location: location
     });
   };
 
@@ -112,13 +120,6 @@ const ActivityForm = ({
     });
   };
 
-  // Crear la actividad
-  const handleCreateActivity = () => {
-    if (onSubmit) {
-      onSubmit(activity);
-    }
-  };
-
   return (
     <div className={styles.formContainer}>
       {/* Primera fila: Título y Ubicación */}
@@ -137,19 +138,12 @@ const ActivityForm = ({
         
         <div className={styles.formGroup + ' ' + styles.width40percentage}>
           <label className={styles.label}>Ubicación:</label>
-          <select
-            name="id_ubicacion"
-            className={styles.select}
-            value={activity.id_ubicacion}
-            onChange={handleInputChange}
-          >
-            <option value="">Seleccionar ubicación</option>
-            {locations.map(location => (
-              <option key={location.id} value={location.id}>
-                {location.name}
-              </option>
-            ))}
-          </select>
+          <LocationField 
+            initialLocation={activity.location}
+            initialAddress={activity.location?.address || ''}
+            onLocationSelect={handleLocationSelect}
+            placeholder="Seleccionar ubicación"
+          />
         </div>
       </div>
 
@@ -322,17 +316,6 @@ const ActivityForm = ({
             </button>
           </div>
         </div>
-      </div>
-      
-      {/* Botón de crear */}
-      <div className={styles.formFooter}>
-        <button 
-          type="button" 
-          className={styles.createButton}
-          onClick={handleCreateActivity}
-        >
-          Crear actividad
-        </button>
       </div>
     </div>
   );

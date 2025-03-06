@@ -1,0 +1,148 @@
+/* Actividades.module.css */
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .activitiesPanel {
+    padding: 24px;
+    transition: width 0.3s ease;
+  }
+  
+  .halfWidth {
+    width: 50%;
+  }
+  
+  .fullWidth {
+    width: 100%;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 40px;
+  }
+  
+  .title {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--text-color);
+  }
+  
+  .createButton {
+    background:  var(--primary-color);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid var(--primary-color);
+    transition: all 0.2s;
+  }
+  
+  .createButton:hover {
+    background: white;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    transition: all 0.2s;
+  }
+  
+  .plusIcon {
+    margin-right: 4px;
+  }
+  
+  .activitiesList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  
+
+  
+  .formPanel {
+    width: 50%;
+    overflow-y: auto;
+    background-color: white;
+    position: relative;
+    overflow-x: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+  }
+
+  
+  .tabsContainer {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: white;
+  top: 0;
+  z-index: 10;
+  height: 8%;
+  justify-content: space-between;
+}
+
+.tab {
+  padding: 16px 24px;
+  background-color: transparent;
+  border: none;
+  color: var(--text-color);
+  border-bottom: 2px solid transparent;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background-color: #f9fafb;
+}
+
+.activeTab {
+  border-bottom: 2px solid #0052cc;
+  color: #0052cc;
+}
+
+
+.footerPanel {
+  height: 10%;
+  padding: 20px;
+  display: flex;
+  justify-content: end;
+  border-top: 1px solid var(--border-color);
+}
+
+.buttonSave {
+  font-size: 1rem !important;
+}
+
+.closeButton {
+  background: white;
+  color: var(--text-color);
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: flex;
+  border: none;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 1;
+}
+
+.closeButton:hover {
+  opacity: 0.5;
+  transition: all 0.2s;
+}

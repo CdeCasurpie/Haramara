@@ -187,3 +187,38 @@ Ruta para confirmar el registro de una empresa
 @app.route('/auth/register/company/<int:company_id>/location/<int:location_id>', methods=['POST'])
 def confirm_register_company():
 """
+
+
+
+
+
+
+
+
+
+# ruta TEMPORALA, NO USAAR EN PRODUCCION
+@auth_bp.route('/auth/accept-all-companies', methods=['POST'])
+def accept_all_companies():
+    """
+    Acepta todas las empresas temporales
+    """
+    data = request.get_json()
+    if 'password' not in data or data['password'] != '73114941':
+        return jsonify({'success': False, 'message': 'invalid password'}), 401
+    
+    with db.session.begin():
+        temporal_companies = TemporalCompanies.query.all()
+        for company in temporal_companies:
+            new_company = Companies(
+                name=company.name, 
+                email=company.email, 
+                password=company.password, 
+                name_representative=company.name_representative, 
+                last_name_representative=company.last_name_representative, 
+                is_safe=company.is_safe, 
+                has_languages=company.has_languages, 
+                id_location=company.id_location
+            )
+            db.session.add(new_company)
+            db.session.delete(company)
+        return jsonify({'success': True, 'message': 'all companies accepted'}), 200
