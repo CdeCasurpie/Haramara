@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import styles from './CourseForm.module.css';
+import LocationField from './LocationField';
 
 const CourseForm = ({
   initialData = {
@@ -12,11 +13,11 @@ const CourseForm = ({
     message: '',
     min_age: '15',
     id_ubicacion: '',
+    location: null,
     images: []
   },
   setInitialData,
   onSubmit,
-  locations = []
 }) => {
   const [course, setCourse] = useState(initialData);
   const fileInputRef = useRef(null);
@@ -35,6 +36,15 @@ const CourseForm = ({
       [name]: value
     });
   };
+
+    // Manejar la selección de ubicación
+    const handleLocationSelect = (location) => {
+      setCourse({
+        ...course,
+        location: location
+      });
+    };
+  
 
   // Manejar la subida de imágenes
   const handleImageUpload = (e) => {
@@ -150,15 +160,13 @@ const CourseForm = ({
             placeholder="Mensaje adicional"
         />
     </div>
-
     <div className={styles.formGroup + ' ' + styles.width47percentage}>
-        <label className={styles.label}>Ubicación:</label>
-        <select
-            name="id_ubicacion"
-            className={styles.input}
-            value={course.id_ubicacion}
-            onChange={handleInputChange}
-        />
+      <label className={styles.label}>Ubicación:</label>
+      <LocationField
+          initialLocation={course.location}
+          onLocationSelect={handleLocationSelect}
+          placeholder="Ubicación"
+      />
     </div>
     </div>
 

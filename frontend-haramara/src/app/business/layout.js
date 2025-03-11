@@ -10,7 +10,7 @@ export default function clientLayout({ children }) {
             <div style={{ position: 'relative', width: '15%', background: 'white', minWidth: '250px'}}>
                 <BusinessSideBar />
             </div>
-            <div style={{ flex: 1, height:'100%', background: 'white', padding: '40px', paddingTop: '40px', paddingLeft: '60px', width: '100%', overflow: 'hidden', paddingRight: '80px' }}>
+            <div style={{ flex: 1, height:'100%', background: 'white', padding: '40px', paddingTop: '40px', paddingLeft: '10px', width: '100%', paddingRight: '80px' }}>
                 {children}
             </div>
         </div>

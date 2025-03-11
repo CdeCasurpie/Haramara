@@ -16,6 +16,9 @@ export default function CourseCard({ info }) {
     level?,
     location,
     price,
+    business,
+    total_revenue,
+    num_reservations,
     */
 
     const handleInscription = () => {
@@ -23,7 +26,11 @@ export default function CourseCard({ info }) {
     }
 
     return (
-        <div className={styles.container}>
+        <div
+            className={styles.container}
+            style={{ transform: info.business ? "scale(0.9)" : "scale(1)" }}
+            >
+
             <div className={styles.imageContainer}>
                 <Gallery images={info.imagesList} />
             </div>
@@ -48,6 +55,14 @@ export default function CourseCard({ info }) {
                                 </div>
                             )
                         }
+                        {
+                            info.business && (
+                                <div className={styles.detailsItem}>
+                                    Precio: 
+                                    {info.price} €
+                                </div>
+                            )
+                        }
                     </div>
 
                     <div className={styles.location}>
@@ -62,14 +77,49 @@ export default function CourseCard({ info }) {
                         </div>
                     </div>
                 </div>
-                <div className={styles.right}>
-                    <Price price={info.price} />
-                    <div className={styles.buttonContainer}>
-                    <HaramaraButton  variant="principal" onClick={handleInscription} className={styles.shortButton}>
-                        <p>VER MÁS  &#x276F;</p>
-                    </HaramaraButton>
-                    </div>
-                </div>
+                {
+                    info.business ? (
+                        <div className={styles.rightBusiness}>
+                            <div className={styles.editContaner}>
+                                <Image
+                                    src="/images/general/edit.svg"
+                                    alt="Editar"
+                                    width={20}
+                                    height={20}
+                                />
+                            </div>
+                            <div className={styles.revenueContainer}>
+                                < div className = {styles.reservationInfo} >
+                                    <div className = {styles.reservationReveneu}>
+                                        <div className={styles.reveneu}>
+                                        {info.total_revenue} €
+                                        </div>
+                                        recaudados                     
+                                    </div>
+                                    <div className={styles.reservationInfo}>
+                                        {info.num_reservations} reservas realizadas
+                                    </div>
+                                </div>
+                                <HaramaraButton  variant="primary" onClick={handleInscription} className={styles.shortButton}>
+                                    <p> VER DETALLE  &#x276F;</p>
+                                </HaramaraButton>
+                            </div>
+                        </div>
+                    ) :
+                    (
+                        <div className={styles.right}>
+                            <div className={styles.priceContainer}>
+                            <Price price={info.price} />
+                            </div>
+                            <div className={styles.buttonContainer}>
+                            <HaramaraButton  variant="principal" onClick={handleInscription} className={styles.shortButton}>
+                                <p>VER MÁS  &#x276F;</p>
+                            </HaramaraButton>
+                            </div>
+                        </div>
+                    )
+                }
+
             </div>
         </div>
 

@@ -1,7 +1,7 @@
 .container{
     width: 45%;
     min-width: 650px;
-    height: 140px;
+    height: 150px;
     display: flex;
     flex-direction: row;
     border-radius: 7px;
@@ -71,6 +71,15 @@
     height: 80%;
 }
 
+.rightBusiness{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 50%;
+    height: 105%;
+}
+
 .details{
     color: var(--text-color);
     justify-content: flex-start;
@@ -97,7 +106,7 @@
 
 .shortButton{
     margin-top: 5px;
-    padding: 5px 10px;
+    padding: 5px 10px !important;
     font-weight: 300;
 }
 
@@ -113,4 +122,45 @@
     margin-left: 6px;
     font-size: 0.8rem;
     font-weight: 350;
+}
+
+.priceContainer{
+    color: var(--primary-color);
+}
+
+.revenueContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: space-between;
+    width: 82%;
+    height: 100%;
+}
+
+.reservationInfo{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 30%;
+}
+
+.reservationReveneu{
+    display: flex;
+    flex-direction: row; 
+    justify-content: space-between;
+    align-items: center;
+    height: 30%;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.reveneu {
+    font-size: 1.5rem;
+    margin-right: 5px;
+}
+
+.reservationInfo {
+    color: var(--text-color);
+    font-size: 1rem;
 }

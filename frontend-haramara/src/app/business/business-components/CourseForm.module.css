@@ -1,13 +1,4 @@
-.formContainer {
-    display: flex;
-    gap: 24px;
-    padding: 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    width: 100%;
-  }
-  
+ 
   .column {
     flex: 1;
     display: flex;
@@ -166,17 +157,7 @@
       flex-direction: column;
     }
   }
-  
-  
-  .formContainer {
-    display: flex;
-    gap: 24px;
-    padding: 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
+
   .column {
     flex: 1;
     display: flex;
@@ -342,14 +323,6 @@
     }
   }
   
-  .formContainer {
-    display: flex;
-    gap: 24px;
-    padding: 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
   
   .column {
     flex: 1;
@@ -576,8 +549,6 @@
   .formContainer {
     padding: 20px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     gap: 16px;
