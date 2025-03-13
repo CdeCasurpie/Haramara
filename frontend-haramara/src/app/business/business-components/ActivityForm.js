@@ -17,7 +17,8 @@ const ActivityForm = ({
     images: []
   },
   setInitialData,
-  locations = []
+  locations = [],
+  isEditing = false
 }) => {
   const [activity, setActivity] = useState(initialData);
   const [newCharacteristic, setNewCharacteristic] = useState({ name: '', value: '' });

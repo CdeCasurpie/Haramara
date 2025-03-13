@@ -26,6 +26,7 @@ export default function Actividades() {
         { id: 6, title: 'Título de la actividad, en Familia', rating: 3 }
     ]);
 
+
     const handleEdit = (activity) => {
         setIsCreating(false);
         if (!isEditing) {

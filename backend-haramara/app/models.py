@@ -69,7 +69,6 @@ class BaseCompanies(db.Model):
     
     def __init__(self, name, email, password, id_location, name_representative, last_name_representative, is_safe, has_languages):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
         self.name = name
         self.email = email
         self.password = hashed_password.decode('utf-8')
@@ -93,7 +92,20 @@ class BaseCompanies(db.Model):
 class Companies(BaseCompanies):
     __tablename__ = 'companies'
     id_location = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
-    
+
+    def __init__(self, name, email, password, id_location, name_representative, last_name_representative, is_safe, has_languages):
+        self.name = name
+        self.email = email
+        self.password = password
+        self.id_location = id_location
+        self.name_representative = name_representative
+        self.last_name_representative = last_name_representative
+        self.is_safe = is_safe
+        self.has_languages = has_languages
+
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
+
 class TemporalCompanies(BaseCompanies):
     __tablename__ = 'temporal_companies'
     id_location = db.Column(db.Integer, db.ForeignKey('temporal_locations.id'), nullable=False)

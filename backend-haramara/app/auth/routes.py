@@ -27,6 +27,7 @@ def login():
     
     entity = search_user(data['email']) if data['type'] == 'user' else search_company(data['email'])
 
+
     if not entity or entity.id == None:
         return jsonify({'success': False, 'message': 'user or company not found'}), 404
     
@@ -43,7 +44,8 @@ def login():
             'id': entity.id,
             'email': entity.email,
             'type': data['type']
-        }
+        },
+        'token': token
     })
 
     set_access_cookies(response, token, max_age=timedelta(days=256))
@@ -197,14 +199,21 @@ def confirm_register_company():
 
 
 # ruta TEMPORALA, NO USAAR EN PRODUCCION
-@auth_bp.route('/auth/accept-all-companies', methods=['POST'])
+@auth_bp.route('/auth/accept-all-companies', methods=['POST', 'GET'])
 def accept_all_companies():
     """
     Acepta todas las empresas temporales
     """
-    data = request.get_json()
-    if 'password' not in data or data['password'] != '73114941':
-        return jsonify({'success': False, 'message': 'invalid password'}), 401
+    try:
+        data = request.get_json()
+        if 'password' not in data or data['password'] != '73114941':
+            return jsonify({'success': False, 'message': 'invalid password'}), 401
+    except Exception as e:
+        #param query
+        params = request.args
+        if 'password' not in params or params['password'] != '73114941':
+            return jsonify({'success': False, 'message': 'invalid password'}), 401
+    
     
     with db.session.begin():
         temporal_companies = TemporalCompanies.query.all()

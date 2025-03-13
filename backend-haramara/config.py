@@ -15,3 +15,10 @@ class Config:
     DEBUG = os.getenv("DEBUG", "False").lower() == "true"
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    DEBUG = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
