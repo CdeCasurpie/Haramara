@@ -1,6 +1,17 @@
-
-
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
   
+.formularioContainer {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
   .formPanel {
     width: 100%;
     overflow-y: auto;
@@ -10,10 +21,11 @@
     border-radius: 6px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
+    flex-grow: 1;
     border-radius: var(--radius);
     border: 1px solid var(--border-color);
+    height: 100%;
+    
   }
 
   
@@ -86,6 +98,17 @@
   gap: 1.5rem;
 }
 
+.turnosContenido {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 1.5rem;
+  overflow-y: auto;
+  gap: 1rem;
+  width: 100%;
+}
+
 .label {
     font-size: 14px;
     color: rgba(0, 0, 0, 0.5);
@@ -114,6 +137,7 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 1.5rem;
+    width: 100%;
 }
 
 .formRow {

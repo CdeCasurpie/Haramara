@@ -223,8 +223,9 @@ class Courses(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     adittional_info = db.Column(db.String(240), nullable=False)
-    details = db.Column(db.String(800), nullable=False)
+    description = db.Column(db.String(800), nullable=False)
     tags = db.Column(db.String(120), nullable=False)
+    vacancies = db.Column(db.Integer, nullable=False)
 
     def save(self):
         db.session.add(self)
@@ -237,7 +238,6 @@ class ShiftCourses(db.Model):
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
     frequency = db.Column(db.String(7), nullable=False)
-    vacancies = db.Column(db.Integer, nullable=False)
     free_vacancies = db.Column(db.Integer, nullable=False)
 
     def save(self):

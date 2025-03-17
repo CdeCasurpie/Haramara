@@ -5,7 +5,7 @@ import CourseForm from "../business-components/CourseForm";
 import Days from "@/components/Days";
 import TurnoCurso from "@/components/TurnoCurso";
 import styles from './Cursos.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import HaramaraButton from '@/components/HaramaraButton';
 import { XIcon } from 'lucide-react';
 
@@ -13,6 +13,14 @@ export default function Cursos() {
     const [activeTab, setActiveTab] = useState('formulario');
     const [isEditing, setIsEditing] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
+    const [currentCourse, setCurrentCourse] = useState(null);
+
+    useEffect(() => {
+        if (isEditing) {
+            console.log("Editando curso", currentCourse);
+        }
+    }, [currentCourse]);
+
     const handleCourseSubmit = (courseData) => {
         console.log("Datos del curso enviados:", courseData);
     };
@@ -24,6 +32,19 @@ export default function Cursos() {
     const handleInputChange = (e) => {
         console.log(e.target.value);
     }
+/*
+    images: '',
+    title: '',
+    startDate: '',
+    endDate: '',
+    price: '',
+    message: '',
+    location: '',
+    description: '',
+    minAge: '',
+    vacancies: '',
+    tags: '',
+*/
     
     const infoCursos = [
         {
@@ -32,13 +53,15 @@ export default function Cursos() {
             title: "curso de natacion",
             startDate: "2025-02-24",
             endDate: "2025-02-26",
-            minAge: 18,
-            level: "Intermedio",
-            location: "Cusquito",
             price: 100,
+            message: "Principiante",
+            location: "Cusquito",
+            description: "Aprende a nadar con los mejores",
+            minAge: 18,
             business: true,
             total_revenue: 1500,
             num_reservations: 10,
+            tags: "#natacion #deporte #agua",
         },
         {
             id: 2,
@@ -46,13 +69,15 @@ export default function Cursos() {
             title: "Curso de prueba",
             startDate: "2025-02-24",
             endDate: "2025-02-26",
-            minAge: 18,
-            level: "Intermedio",
-            location: "Cusquito",
             price: 100,
+            message: "Principiante",
+            location: "Cusquito",
+            description: "Aprende a nadar con los mejores",
+            minAge: 18,
             business: true,
-            total_revenue: 1000,
+            total_revenue: 1500,
             num_reservations: 10,
+            tags: "#natacion #deporte #agua",
         }
     ]
 
@@ -80,18 +105,15 @@ export default function Cursos() {
     const [days, setDays] = useState([false, false, false, false, false, false, false]);
 
     return (
-        <div style={{ width: "100%",  display: "flex", flexDirection: "row", padding: 0, margin: 0 }}> 
+        <div className={styles.container}> 
             <div style={{ display: 'flex', flexDirection: 'column' }}>  
                 <div className={styles.formRow} style={{padding: "0rem 2.5rem"}} >
                     <div style = {{fontSize: '1.3rem', fontWeight: '400', marginBottom: '1rem', color: 'black'}}>
                     Cursos Creados:
                     </div>
-                    <HaramaraButton className={styles.buttonSave} variant="principal">
-                        Crear Curso +
-                    </HaramaraButton>
                 </div>
                 {infoCursos.map((info) => (
-                    <CourseCard key={info.id} info={info} />
+                    <CourseCard key={info.id} info={info} setCurrentCourse={setCurrentCourse} />
                 ))}
 
             </div>
@@ -113,15 +135,32 @@ export default function Cursos() {
                     </button>
                 </div>
             </div>
+
+
                 
                 {
                     activeTab === 'formulario' ? (
-                        <div style={{overflowY: 'scroll' }}>
-                            <CourseForm onSubmit={handleCourseSubmit}
+                        <div className={styles.formularioContainer}>
+                            <CourseForm onSubmit={handleCourseSubmit} 
+                                initialData={
+                                    currentCourse ? {
+                                        id: currentCourse.id,
+                                        title: currentCourse.title,
+                                        start_date: currentCourse.start_date,
+                                        end_date: currentCourse.end_date,
+                                        price: currentCourse.price,
+                                        message: currentCourse.message,
+                                        location: currentCourse.location,
+                                        images: currentCourse.images,
+                                        description: currentCourse.description,
+                                        min
+                                    } : undefined
+                                }
+                                setInitialData={setCurrentCourse}
                             />
                         </div>
                     ) : (
-                        <div style={{overflowY: 'scroll', padding: '1rem'}}>
+                        <div className={styles.turnosContenido}>
                         <div className={styles.formTurnos}>
                             <div className={styles.formRow}>
                                 <div className={styles.formGroup}>

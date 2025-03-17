@@ -5,7 +5,7 @@ import Price from './Price';
 import HaramaraButton from './HaramaraButton';
 
 
-export default function CourseCard({ info }) {
+export default function CourseCard({ info, setCurrentCourse }) {
     /*
     id,
     imageList,
@@ -80,7 +80,9 @@ export default function CourseCard({ info }) {
                 {
                     info.business ? (
                         <div className={styles.rightBusiness}>
-                            <div className={styles.editContaner}>
+                            <div className={styles.editContaner}
+                                onClick={() => setCurrentCourse(info)}
+                            >
                                 <Image
                                     src="/images/general/edit.svg"
                                     alt="Editar"

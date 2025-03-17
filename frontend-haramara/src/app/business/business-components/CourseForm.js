@@ -6,15 +6,17 @@ import LocationField from './LocationField';
 
 const CourseForm = ({
   initialData = {
+    images: [],
     title: '',
+    startDate: '',
+    endDate: '',
     price: '',
-    start_date: '',
-    end_date: '',
     message: '',
-    min_age: '15',
-    id_ubicacion: '',
-    location: null,
-    images: []
+    location: '',
+    description: '',
+    minAge: '',
+    vacancies: '',
+    tags: '',
   },
   setInitialData,
   onSubmit,
@@ -117,17 +119,17 @@ const CourseForm = ({
       <div className={styles.formRow}>
         <input
             type="date"
-            name="start_date"
+            name="startDate"
             className={styles.input + ' ' + styles.width47percentage}
-            value={course.start_date}
+            value={course.startDate}
             onChange={handleInputChange}
             placeholder="Fecha de inicio"
         />
         <input
             type="date"
-            name="end_date"
+            name="endDate"
             className={styles.input + ' ' + styles.width47percentage}
-            value={course.end_date}
+            value={course.endDate}
             onChange={handleInputChange}
             placeholder="Fecha de fin"
         />
@@ -157,7 +159,7 @@ const CourseForm = ({
             className={styles.input}
             value={course.message}
             onChange={handleInputChange}
-            placeholder="Mensaje adicional"
+            placeholder="Nivel?"
         />
     </div>
     <div className={styles.formGroup + ' ' + styles.width47percentage}>
@@ -170,10 +172,49 @@ const CourseForm = ({
     </div>
     </div>
 
-    {/* Quinta fila: Imágenes */}
+    {/* Cuarta fila: min_age, vacancies */}
+    <div className={styles.formRow}>
+    <div className={styles.formGroup + ' ' + styles.width47percentage}>
+        <label className={styles.label}>Edad mínima: </label>
+        <input
+            type="text"
+            name="minAge"
+            className={styles.input}
+            value={course.minAge}
+            onChange={handleInputChange}
+            placeholder="10"
+        />
+    </div>
+    <div className={styles.formGroup + ' ' + styles.width47percentage}>
+        <label className={styles.label}>Vacantes iniciales: </label>
+        <input
+            type="number"
+            name="vacancies"
+            className={styles.input}
+            value={course.vacancies}
+            onChange={handleInputChange}
+            placeholder="15"
+        />
+    </div>
+    </div>
+
+    {/* Quinta fila: Tags */}
+    <div className={styles.formGroup}>
+        <label className={styles.label}>Tags: </label>
+        <input
+            type="text"
+            name="tags"
+            className={styles.input}
+            value={course.tags}
+            onChange={handleInputChange}
+            placeholder="#nature#yoga#meditation"
+        />
+    </div>
+
+    {/* sexta fila: Imágenes */}
     <div className={styles.formGroup}>
       <div className={styles.imagesHeader}>
-        <label className={styles.label}>Imágenes de la actividad:</label>
+        <label className={styles.label}>Imágenes del curso:</label>
         <button 
           type="button" 
           className={styles.addButton}
@@ -225,7 +266,7 @@ const CourseForm = ({
             className={styles.textarea}
             value={course.description}
             onChange={handleInputChange}
-            placeholder="Descripción detallada de la actividad"
+            placeholder="Descripción detallada del curso"
         />
     </div>
 
