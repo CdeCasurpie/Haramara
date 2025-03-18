@@ -48,12 +48,26 @@ const NavBar = () => {
           {
             loading ? (
               <></>
-            ) : userType === "user" ? (
+            ) : userType === "user"  ? (
               <div className={styles.options}>
                 <ProfileCard 
                   urlImage={user?.url_image} 
                   name={user?.username} 
                   role={userType} 
+                />
+                <HaramaraButton 
+                  variant="primary"
+                  onClick={() => handleLogout(setUser, setUserType, setLoading)}
+                >
+                  CERRAR SESIÓN
+                </HaramaraButton>
+              </div>
+            ) : userType === "company" ? (
+              <div className={styles.options}>
+                <ProfileCard 
+                  urlImage={user?.url_image} 
+                  name={user?.name} 
+                  role={user?.email} 
                 />
                 <HaramaraButton 
                   variant="primary"

@@ -191,12 +191,20 @@ export default function Actividades() {
 
                 {/* Debug section - Puedes eliminar esto en producción */}
                 {selectedActivity && (
+                    <>
                     <pre
                         style={{
                             width: '100%',
                             color: 'black'
                         }}
                     >{JSON.stringify(selectedActivity, null, 2)}</pre>
+                    <pre
+                        style={{
+                            width: '100%',
+                            color: 'black'
+                        }}
+                    >{JSON.stringify(activityShifts, null, 2)}</pre>
+                    </>
                 )}
             </div>
 

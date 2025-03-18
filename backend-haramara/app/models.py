@@ -160,7 +160,7 @@ class Activities(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_service = db.Column(db.Integer, db.ForeignKey('services.id'))
     titulo = db.Column(db.String(120), nullable=False)
-    id_ubicacion = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+    ubicacion = db.Column(db.String(512), nullable=False)
     price_per_person = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(240), nullable=False)
     features = db.Column(db.JSON, nullable=False)
