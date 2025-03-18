@@ -7,7 +7,7 @@ import styles from './NavBar.module.css';
 import { useUser } from '@/app/UserContext';
 import ProfileCard from './ProfileCard';
 import { handleLogout } from '@/app/client/auth/utils';
-
+import API_BASE_URL from '@/config';
 const NavBar = () => {
   const {user, userType, loading, setUser, setLoading, setUserType} = useUser();
 
@@ -51,7 +51,7 @@ const NavBar = () => {
             ) : userType === "user"  ? (
               <div className={styles.options}>
                 <ProfileCard 
-                  urlImage={user?.url_image} 
+                  urlImage={user?.url_image ? (API_BASE_URL + user?.url_image) : null}
                   name={user?.username} 
                   role={userType} 
                 />
@@ -65,7 +65,7 @@ const NavBar = () => {
             ) : userType === "company" ? (
               <div className={styles.options}>
                 <ProfileCard 
-                  urlImage={user?.url_image} 
+                  urlImage={user?.url_image ? (API_BASE_URL + user?.url_image) : null}
                   name={user?.name} 
                   role={user?.email} 
                 />

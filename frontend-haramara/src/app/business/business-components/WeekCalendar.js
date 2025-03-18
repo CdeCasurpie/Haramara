@@ -70,15 +70,6 @@ const WeekCalendar = ({
                   <div className={styles.shiftSlots}>
                     {shift.availableSlots} cupos disponibles
                   </div>
-                  {onDeleteShift && (
-                    <button 
-                      className={styles.deleteShiftButton}
-                      onClick={() => onDeleteShift(shift.id)}
-                      title="Eliminar turno"
-                    >
-                      ×
-                    </button>
-                  )}
                 </div>
               ))}
           </div>

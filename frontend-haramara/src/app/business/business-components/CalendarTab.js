@@ -75,8 +75,10 @@ const CalendarTab = ({
   };
 
   const handleDeleteShift = (shiftId) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este turno?')) {
-      setActivityShifts(activityShifts.filter(shift => shift.id !== shiftId));
+    if (typeof window !== "undefined") {
+      if (window.confirm('¿Estás seguro de que deseas eliminar este turno?')) {
+        setActivityShifts(activityShifts.filter(shift => shift.id !== shiftId));
+      }
     }
   };
 

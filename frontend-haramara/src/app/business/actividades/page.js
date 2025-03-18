@@ -134,6 +134,7 @@ export default function Actividades() {
             } else if (isEditing) {
                 // Actualizar actividad existente
                 const updatedActivity = await updateActivity(selectedActivity.id, selectedActivity);
+                await createShifts(selectedActivity.id, activityShifts);
                 
                 // Actualizar la lista de actividades
                 const updatedActivities = activities.map(act => 
@@ -141,11 +142,7 @@ export default function Actividades() {
                 );
                 setActivities(updatedActivities);
                 
-                // Solo crear los turnos nuevos (los que no tienen ID)
-                const newShifts = activityShifts.filter(shift => !shift.id);
-                if (newShifts.length > 0) {
-                    await createShifts(selectedActivity.id, newShifts);
-                }
+                
                 
                 // Resetear estados
                 setIsEditing(false);
@@ -179,6 +176,7 @@ export default function Actividades() {
                         {activities.map((activity) => (
                             <BusinessActivity 
                                 key={activity.id} 
+                                image={activity.images[0]?.url || "/images/general/placeholder_image.png"}
                                 activity={activity}
                                 rating={activity.rating}
                                 title={activity.title}
@@ -192,7 +190,7 @@ export default function Actividades() {
                 {/* Debug section - Puedes eliminar esto en producción */}
                 {selectedActivity && (
                     <>
-                    <pre
+                    {/* <pre
                         style={{
                             width: '100%',
                             color: 'black'
@@ -203,7 +201,7 @@ export default function Actividades() {
                             width: '100%',
                             color: 'black'
                         }}
-                    >{JSON.stringify(activityShifts, null, 2)}</pre>
+                    >{JSON.stringify(activityShifts, null, 2)}</pre> */}
                     </>
                 )}
             </div>

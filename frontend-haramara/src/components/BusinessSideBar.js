@@ -37,7 +37,17 @@ const getIdByPath = (path) => {
 
 const BusinessSideBar = ({ initialActive = 0, setActiveState }) => {
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState(getIdByPath(window.location.pathname));
+  const [activeItem, setActiveItem] = useState(getIdByPath(
+    typeof window !== "undefined" ? window.location.pathname : "/"
+  ));
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (typeof window !== "undefined") {
+        setActiveItem(getIdByPath(window.location.pathname));
+      }
+    }, 500);
+  }, [])
 
   // Menu items configuration
   const menuItems = [

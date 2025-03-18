@@ -2,28 +2,56 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './MisDatos.module.css';
-import LocationField from '../business-components/LocationField';
+import { fetchCompanyData, updateCompanyData, updateCompanyImages } from './utils';
+import API_BASE_URL from '@/config';
 
 export default function MisDatos() {
+  // Estado para los datos del formulario
   const [formData, setFormData] = useState({
-    companyName: 'HARAMARA BUSINESS',
-    description: '# Sobre nosotros\n\nSomos una empresa dedicada a actividades acuáticas en la costa del Pacífico mexicano. Ofrecemos experiencias únicas en:\n\n- Kayak\n- Buceo\n- Paddleboard\n- Surf\n\n## Nuestra misión\n\nConectar a las personas con el mar de manera segura y responsable.',
-    phone: '+52 123 456 7890',
-    email: 'info@haramarabusiness.com',
-    website: 'www.haramarabusiness.com',
-    address: 'Playa Los Muertos 123, Sayulita, Nayarit, México',
-    facebook: '',
-    instagram: ''
+    name: '',
+    email: '',
+    password: '', // Solo para cambios de contraseña
+    url_image_logo: '',
+    url_image_portada: '',
+    name_representative: '',
+    last_name_representative: '',
+    is_safe: false,
+    has_languages: false,
+    description: '', // Campo de descripción (a añadir en BD)
+    // Datos de ubicación
+    location: {
+      address: '',
+      country: '',
+      comunity: '',
+      province: '',
+      postal_code: ''
+    }
   });
   
   const [originalData, setOriginalData] = useState({});
   const [isChanged, setIsChanged] = useState(false);
-  const [profileImage, setProfileImage] = useState('');
-  const [coverImage, setCoverImage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [logoFile, setLogoFile] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
   const [previewMode, setPreviewMode] = useState(false);
   
+  // Cargar datos de la empresa al montar el componente
   useEffect(() => {
-    setOriginalData(formData);
+    const loadCompanyData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchCompanyData();
+        setFormData(data);
+        setOriginalData(data);
+        setIsLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setIsLoading(false);
+      }
+    };
+    
+    loadCompanyData();
   }, []);
   
   // Chequea si los datos han cambiado
@@ -33,25 +61,91 @@ export default function MisDatos() {
   }, [formData, originalData]);
   
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    const { name, value, type, checked } = e.target;
+    
+    if (name.includes('.')) {
+      // Para campos anidados como location.address
+      const [parent, child] = name.split('.');
+      setFormData({
+        ...formData,
+        [parent]: {
+          ...formData[parent],
+          [child]: value
+        }
+      });
+    } else {
+      // Para campos simples
+      setFormData({
+        ...formData,
+        [name]: type === 'checkbox' ? checked : value
+      });
+    }
   };
   
-  const handleSave = () => {
-    setOriginalData(formData);
-    setIsChanged(false);
-    alert('Datos guardados correctamente');
+  const handleLogoChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setLogoFile(file);
+      // Crear una URL para previsualizarlo
+      const fileURL = URL.createObjectURL(file);
+      setFormData({
+        ...formData,
+        url_image_logo: fileURL
+      });
+    }
+  };
+  
+  const handleCoverChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setCoverFile(file);
+      // Crear una URL para previsualizarlo
+      const fileURL = URL.createObjectURL(file);
+      setFormData({
+        ...formData,
+        url_image_portada: fileURL
+      });
+    }
+  };
+  
+  const handleSave = async () => {
+    try {
+      setIsLoading(true);
+      // Primero actualizar las imágenes si hay cambios
+      if (logoFile || coverFile) {
+        await updateCompanyImages(logoFile, coverFile);
+      }
+      
+      // Luego actualizar los datos del formulario
+      await updateCompanyData(formData);
+      
+      // Actualizar el estado
+      setOriginalData(formData);
+      setIsChanged(false);
+      setLogoFile(null);
+      setCoverFile(null);
+
+      alert('Datos guardados correctamente');
+      
+    } catch (err) {
+      alert(`Error al guardar los datos: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleCancel = () => {
     setFormData(originalData);
     setIsChanged(false);
+    setLogoFile(null);
+    setCoverFile(null);
+    
+    // Si había URLs temporales creadas, limpiarlas
+    if (logoFile) URL.revokeObjectURL(formData.url_image_logo);
+    if (coverFile) URL.revokeObjectURL(formData.url_image_portada);
   };
   
-  // Markdown render format
+  // Markdown render format para la descripción
   const renderFormattedText = (text) => {
     if (!text) return null;
     
@@ -69,27 +163,39 @@ export default function MisDatos() {
       }
     });
   };
+
+  if (error) {
+    return <div className={styles.error}>Error: {error}</div>;
+  }
   
   return (
     <div className={styles.fullContainer}>
       <div className={styles.fullCard}>
+        
         <div className={styles.twoColumn}>
           {/* Left Column - Profile and Description */}
           <div className={styles.leftColumn}>
             {/* Cover Image */}
             <div className={styles.coverImageContainer}>
-                {coverImage && (
-              <img 
-                src={coverImage} 
-                alt="Portada" 
-                className={styles.coverImage} 
-              />)}
-              <button className={styles.imageButton}>
+              {formData.url_image_portada && (
+                <img 
+                  src={formData.url_image_portada ? (API_BASE_URL + formData.url_image_portada) : ''}
+                  alt="Portada" 
+                  className={styles.coverImage} 
+                />
+              )}
+              <label className={styles.imageButton}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                   <circle cx="12" cy="13" r="4"></circle>
                 </svg>
-              </button>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  style={{ display: 'none' }} 
+                  onChange={handleCoverChange}
+                />
+              </label>
             </div>
             
             {/* Profile Section y Profile Image */}
@@ -97,24 +203,31 @@ export default function MisDatos() {
               <div className={styles.profileInfo}>
                 <div className={styles.profileImageContainer}>
                   <img 
-                    src={profileImage ? profileImage : '/images/general/profile_default.svg'}
+                    src={formData.url_image_logo ? (API_BASE_URL + formData.url_image_logo) : '/images/general/profile_default.svg'}
                     alt="Logo" 
                     className={styles.profileImage} 
                   />
-                  <button className={styles.profileImageButton}>
+                  <label className={styles.profileImageButton}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                       <circle cx="12" cy="13" r="4"></circle>
                     </svg>
-                  </button>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      style={{ display: 'none' }} 
+                      onChange={handleLogoChange}
+                    />
+                  </label>
                 </div>
                 <div className={styles.companyName}>
                   <input
                     type="text"
-                    name="companyName"
-                    value={formData.companyName}
+                    name="name"
+                    value={formData.name}
                     onChange={handleInputChange}
                     className={styles.companyNameInput}
+                    placeholder="Nombre de la empresa"
                   />
                 </div>
               </div>
@@ -132,6 +245,7 @@ export default function MisDatos() {
                     value={formData.description}
                     onChange={handleInputChange}
                     className={styles.textareaFull}
+                    placeholder="Agrega una descripción de tu empresa..."
                   />
                   <div className={styles.helpText}>
                     <svg className={styles.helpIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -162,19 +276,7 @@ export default function MisDatos() {
           <div className={styles.rightColumn}>
             <div className={styles.formContainer}>
               <div className={styles.formRows}>
-                <div className={styles.formField}>
-                  <label className={styles.label}>
-                    Teléfono
-                  </label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className={styles.input}
-                  />
-                </div>
-                
+                {/* Datos principales */}
                 <div className={styles.formField}>
                   <label className={styles.label}>
                     Correo Electrónico
@@ -188,63 +290,148 @@ export default function MisDatos() {
                   />
                 </div>
                 
+                {/* Datos del representante */}
+                <div className={styles.formRow}>
+                  <div className={styles.formField}>
+                    <label className={styles.label}>
+                      Nombre del Representante
+                    </label>
+                    <input
+                      type="text"
+                      name="name_representative"
+                      value={formData.name_representative}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  
+                  <div className={styles.formField}>
+                    <label className={styles.label}>
+                      Apellido del Representante
+                    </label>
+                    <input
+                      type="text"
+                      name="last_name_representative"
+                      value={formData.last_name_representative}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+                
+                {/* Contraseña (para cambios) */}
                 <div className={styles.formField}>
                   <label className={styles.label}>
-                    Sitio Web
+                    Cambiar Contraseña (dejar en blanco para mantener la actual)
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className={styles.input}
+                    placeholder="Nueva contraseña"
+                  />
+                </div>
+                
+                {/* Checkboxes */}
+                <div className={styles.formRow}>
+                  <div className={styles.formField}>
+                  <label className={styles.checkboxContainer}>
+                      <input
+                        type="checkbox"
+                        name="is_safe"
+                        checked={formData.is_safe}
+                        onChange={handleInputChange}
+                        className={styles.checkbox}
+                      />
+                      <span className={styles.checkboxToggle}></span>
+                      <span className={styles.checkboxLabel}>Es Seguro</span>
+                    </label>
+                  </div>
+                  
+                  <div className={styles.formField}>
+                    <label className={styles.checkboxContainer}>
+                      <input
+                        type="checkbox"
+                        name="has_languages"
+                        checked={formData.has_languages}
+                        onChange={handleInputChange}
+                        className={styles.checkbox}
+                      />
+                      <span className={styles.checkboxToggle}></span>
+                      <span className={styles.checkboxLabel}>Tiene Idiomas Adicionales</span>
+                    </label>
+                  </div>
+                </div>
+                
+                {/* Dirección */}
+                <div className={styles.formField}>
+                  <label className={styles.label}>
+                    Dirección
                   </label>
                   <input
                     type="text"
-                    name="website"
-                    value={formData.website}
+                    name="location.address"
+                    value={formData.location.address}
                     onChange={handleInputChange}
                     className={styles.input}
                   />
                 </div>
                 
-                <div className={styles.formField}>
-                  <label className={styles.label}>
-                    Dirección
-                  </label>
-                  <LocationField 
-                    value={formData.address}
-                    onLocationSelect={(value) => {
-                      setFormData({
-                        ...formData,
-                        address: value
-                      });
-                    }}
-                  />
+                <div className={styles.formRow}>
+                  <div className={styles.formField}>
+                    <label className={styles.label}>
+                      País
+                    </label>
+                    <input
+                      type="text"
+                      name="location.country"
+                      value={formData.location.country}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  
+                  <div className={styles.formField}>
+                    <label className={styles.label}>
+                      Comunidad
+                    </label>
+                    <input
+                      type="text"
+                      name="location.comunity"
+                      value={formData.location.comunity}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
                 </div>
                 
-                {/* Social Media Links */}
-                <div className={styles.socialMedia}>
-                  <div className={styles.socialGrid}>
-                    <div className={styles.formField}>
-                      <label className={styles.label}>
-                        Facebook
-                      </label>
-                      <input
-                        type="text"
-                        name="facebook"
-                        value={formData.facebook}
-                        onChange={handleInputChange}
-                        placeholder="URL de Facebook"
-                        className={styles.input}
-                      />
-                    </div>
-                    <div className={styles.formField}>
-                      <label className={styles.label}>
-                        Instagram
-                      </label>
-                      <input
-                        type="text"
-                        name="instagram"
-                        value={formData.instagram}
-                        onChange={handleInputChange}
-                        placeholder="URL de Instagram"
-                        className={styles.input}
-                      />
-                    </div>
+                <div className={styles.formRow}>
+                  <div className={styles.formField}>
+                    <label className={styles.label}>
+                      Provincia
+                    </label>
+                    <input
+                      type="text"
+                      name="location.province"
+                      value={formData.location.province}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
+                  </div>
+                  
+                  <div className={styles.formField}>
+                    <label className={styles.label}>
+                      Código Postal
+                    </label>
+                    <input
+                      type="text"
+                      name="location.postal_code"
+                      value={formData.location.postal_code}
+                      onChange={handleInputChange}
+                      className={styles.input}
+                    />
                   </div>
                 </div>
               </div>
@@ -255,22 +442,30 @@ export default function MisDatos() {
                   <button 
                     onClick={handleCancel}
                     className={`${styles.button} ${styles.buttonCancel}`}
+                    disabled={isLoading}
                   >
                     Cancelar
                   </button>
                 )}  
                 <button 
                   onClick={handleSave}
-                  disabled={!isChanged}
-                  className={`${styles.button} ${styles.buttonSuccess} ${!isChanged ? styles.buttonDisabled : ''}`}
+                  disabled={!isChanged || isLoading}
+                  className={`${styles.button} ${styles.buttonSuccess} ${(!isChanged || isLoading) ? styles.buttonDisabled : ''}`}
                 >
                   <span className={styles.iconWrapper}>
-                    <svg className={styles.iconMargin} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                      <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                      <polyline points="7 3 7 8 15 8"></polyline>
-                    </svg>
-                    Guardar Cambios
+                    {isLoading ? (
+                      <svg className={styles.iconMargin} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                      </svg>
+                    ) : (
+                      <svg className={styles.iconMargin} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                      </svg>
+                    )}
+                    {isLoading ? 'Guardando...' : 'Guardar Cambios'}
                   </span>
                 </button>
               </div>

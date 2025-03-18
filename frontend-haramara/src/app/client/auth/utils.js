@@ -7,6 +7,7 @@ export const handleRegisterUser = async (formData, setFormData, setUser, setUser
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
             },
             credentials: "include",
             body: JSON.stringify(formData),
@@ -64,6 +65,7 @@ export const handleRegisterCompany = async (formData, setFormData, setUser, setU
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
             },
             credentials: "include",
             body: JSON.stringify(formData),
@@ -103,6 +105,7 @@ export const handleLoginEspecific = async (formData, setFormData, setUser, setUs
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
             },
             mode: "cors",
             credentials: "include",
@@ -152,6 +155,7 @@ const handleCurrentUser = async () => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
             },
             mode: "cors",
             credentials: "include",
@@ -179,10 +183,13 @@ export const handleLogout = async (setUser, setUserType, router) => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
         },
         mode: "cors",
         credentials: "include",
     }).then(() => {
-        window.location.href = "/client";
+        if (typeof window !== "undefined") {
+            window.location.href = "/client";
+        }
     })
 }

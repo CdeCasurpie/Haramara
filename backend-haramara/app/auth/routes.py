@@ -230,4 +230,17 @@ def accept_all_companies():
             )
             db.session.add(new_company)
             db.session.delete(company)
+        
+        temporal_locations = TemporalLocations.query.all()
+        for location in temporal_locations:
+            new_location = Locations(
+                address=location.address,
+                country=location.country,
+                comunity=location.comunity,
+                province=location.province,
+                postal_code=location.postal_code
+            )
+            db.session.add(new_location)
+            db.session.delete(location)
+        
         return jsonify({'success': True, 'message': 'all companies accepted'}), 200

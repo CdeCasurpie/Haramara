@@ -23,10 +23,14 @@ export const UserProvider = ({ children }) => {
             }
         };
 
-        window.addEventListener("storage", handleStorageChange);
+        if (typeof window !== "undefined") {
+            window.addEventListener("storage", handleStorageChange);
+        }
 
         return () => {
-            window.removeEventListener("storage", handleStorageChange);
+            if (typeof window !== "undefined") {
+                window.removeEventListener("storage", handleStorageChange);
+            }
         };
     }, []);
 
@@ -36,6 +40,7 @@ export const UserProvider = ({ children }) => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true",
                 },
                 credentials: "include"
             });

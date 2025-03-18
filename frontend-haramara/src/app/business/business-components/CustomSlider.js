@@ -44,8 +44,14 @@ const CustomSlider = ({
       });
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    if (typeof window !== "undefined") {
+      window.addEventListener('resize', handleResize);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener('resize', handleResize);
+      }
+    }
   }, [children, itemHeight, gap, maxHeight, visibleItems]);
 
   // Número total de páginas

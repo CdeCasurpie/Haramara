@@ -29,14 +29,16 @@ const LeafletLocationSelector = ({
       document.head.appendChild(linkElement);
     }
 
-    if (!window.L) {
-      const scriptElement = document.createElement('script');
-      scriptElement.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      scriptElement.crossOrigin = '';
-      scriptElement.onload = initializeMap;
-      document.head.appendChild(scriptElement);
-    } else {
-      initializeMap();
+    if (typeof window !== "undefined") {
+      if (!window.L) {
+        const scriptElement = document.createElement('script');
+        scriptElement.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        scriptElement.crossOrigin = '';
+        scriptElement.onload = initializeMap;
+        document.head.appendChild(scriptElement);
+      } else {
+        initializeMap();
+      }
     }
 
     return () => {
@@ -149,7 +151,8 @@ const LeafletLocationSelector = ({
       setIsSearching(true);
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.lat}&lon=${location.lng}&zoom=18&addressdetails=1`,
-        { headers: { 'Accept-Language': 'es' } }
+        { headers: { 'Accept-Language': 'es',
+          "ngrok-skip-browser-warning": "true", } }
       );
       
       if (!response.ok) throw new Error('Error en la respuesta del servidor');
@@ -205,7 +208,8 @@ const LeafletLocationSelector = ({
       setIsSearching(true);
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=5`,
-        { headers: { 'Accept-Language': 'es' } }
+        { headers: { 'Accept-Language': 'es',
+          "ngrok-skip-browser-warning": "true", } }
       );
       
       if (!response.ok) throw new Error('Error en la respuesta del servidor');
@@ -234,7 +238,8 @@ const LeafletLocationSelector = ({
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&limit=5`,
-        { headers: { 'Accept-Language': 'es' } }
+        { headers: { 'Accept-Language': 'es',
+          "ngrok-skip-browser-warning": "true", } }
       );
       
       if (!response.ok) throw new Error('Error en la respuesta del servidor');

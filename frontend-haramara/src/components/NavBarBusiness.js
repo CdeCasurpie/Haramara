@@ -17,7 +17,7 @@ const NavBarBusiness = () => {
         <div className={styles.content}>
           {/* Logo */}
           <div className={styles.logo}>
-            <Link href="/" className={styles.logoLink}>
+            <Link href="/business/dashboard" className={styles.logoLink}>
               <Image
                 src="/icons/logos/haramara.svg"
                 alt="Haramara logo"

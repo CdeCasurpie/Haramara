@@ -22,7 +22,8 @@ const fetchActivities = async () => {
   const response = await fetch(`${API_BASE_URL}/company/activities`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "ngrok-skip-browser-warning": "true",
     },
     credentials: 'include'
   });
@@ -37,7 +38,8 @@ const fetchActivityById = async (id) => {
   const response = await fetch(`${API_BASE_URL}/company/activities/${id}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "ngrok-skip-browser-warning": "true",
     },
     credentials: 'include'
   });
@@ -65,7 +67,8 @@ const createActivity = async (activityData) => {
   const response = await fetch(`${API_BASE_URL}/company/activities`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "ngrok-skip-browser-warning": "true",
     },
     credentials: 'include',
     body: JSON.stringify(requestData)
@@ -96,12 +99,13 @@ const updateActivity = async (id, activityData) => {
   if (activityData.characteristics !== undefined) requestData.features = activityData.characteristics;
   if (activityData.tags !== undefined) requestData.tags = activityData.tags;
   if (activityData.location !== undefined) requestData.location = activityData.location;
-  if (activityData.images !== undefined) requestData.images = activityData.images;
+  if (activityData.images !== undefined) { requestData.images = activityData.images } else { requestData.images = [] };
   
   const response = await fetch(`${API_BASE_URL}/company/activities/${id}`, {
     method: 'PUT',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "ngrok-skip-browser-warning": "true",
     },
     credentials: 'include',
     body: JSON.stringify(requestData)
@@ -123,7 +127,8 @@ const deleteActivity = async (id) => {
   const response = await fetch(`${API_BASE_URL}/company/activities/${id}`, {
     method: 'DELETE',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "ngrok-skip-browser-warning": "true",
     },
     credentials: 'include'
   });
@@ -133,24 +138,49 @@ const deleteActivity = async (id) => {
 
 // Obtener los turnos de una actividad
 const fetchShiftsByActivityId = async (activityId) => {
+    const values = {
+        'Mo': 'Lunes',
+        'Tu': 'Martes',
+        'We': 'Miércoles',
+        'Th': 'Jueves',
+        'Fr': 'Viernes',
+        'Sa': 'Sábado',
+        'Su': 'Domingo'
+    }
 
   const response = await fetch(`${API_BASE_URL}/company/activities/${activityId}/shifts`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "ngrok-skip-browser-warning": "true",
     },
     credentials: 'include'
   });
   
   const data = await handleResponse(response);
-  return data.shifts || [];
+  return data.shifts ? data.shifts.map(shift => ({
+    ...shift,
+    day: values[shift.day]
+  })) : [];
 };
 
 // Crear nuevos turnos para una actividad
 const createShifts = async (activityId, shiftsData) => {
 
-  // Preparar datos para el envío - solo enviar los turnos sin ID (nuevos)
-  const newShifts = shiftsData.filter(shift => !shift.id);
+  const values = {
+    'Lunes': 'Mo',
+    'Martes': 'Tu',
+    'Miércoles': 'We',
+    'Jueves': 'Th',
+    'Viernes': 'Fr',
+    'Sábado': 'Sa',
+    'Domingo': 'Su'
+  }
+
+  const newShifts = shiftsData.map(shift => ({
+    ...shift,
+    day: values[shift.day]
+  }));
   
   // Si no hay turnos nuevos, no hacer la petición
   if (newShifts.length === 0) {
@@ -170,7 +200,8 @@ const createShifts = async (activityId, shiftsData) => {
   const response = await fetch(`${API_BASE_URL}/company/activities/${activityId}/shifts`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "ngrok-skip-browser-warning": "true",
     },
     credentials: 'include',
     body: JSON.stringify({ shifts: formattedShifts })

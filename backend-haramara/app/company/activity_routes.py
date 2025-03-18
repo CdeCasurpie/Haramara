@@ -234,6 +234,8 @@ def update_activity(activity_id):
     """
     company_id = get_jwt_identity()
     data = request.get_json()
+
+    print(data)
     
     try:
         # Verificar que la actividad pertenezca a la empresa
@@ -273,6 +275,7 @@ def update_activity(activity_id):
         
         # Actualizar imágenes si se proporcionan
         if 'images' in data and isinstance(data['images'], list):
+            print(data['images'])
             # Obtener servicio asociado
             service_id = activity.id_service
             
@@ -364,27 +367,8 @@ def create_shifts(activity_id):
                 shift.save()
                 created_shifts.append(shift)
                 
-                # Crear cupos para cada día entre start_date y end_date
-                available_slots = shift_data.get('availableSlots', activity.initial_vacancies)
-                current_date = shift.start_date
-                day_code = shift.date  # Mo, Tu, We, Th, Fr, Sa, Su
-                
-                # Mapeo de códigos de día a números de la semana (0=Lunes, 6=Domingo)
-                day_mapping = {'Mo': 0, 'Tu': 1, 'We': 2, 'Th': 3, 'Fr': 4, 'Sa': 5, 'Su': 6}
-                
-                while current_date <= shift.end_date:
-                    # Verificar si el día de la semana coincide con el turno
-                    weekday = current_date.weekday()  # 0=Lunes, 6=Domingo
-                    
-                    if weekday == day_mapping.get(day_code, -1):
-                        cupo = Cupos(
-                            id_ShiftActivity=shift.id,
-                            fecha=current_date,
-                            free_vacancies=available_slots
-                        )
-                        cupo.save()
-                    
-                    current_date += timedelta(days=1)
+                # No generamos cupos automáticamente aquí
+                # La lógica de cupos será manejada por separado
                 
             except ValueError as ve:
                 return jsonify({
