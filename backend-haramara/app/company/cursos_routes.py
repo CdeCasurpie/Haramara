@@ -146,11 +146,27 @@ def create_course():
                         db.session.add(image)
                         db.session.flush()
 
-            return jsonify({"success": True, "message": "Curso creado exitosamente", "data": {"id": course.id, "id_service": service.id, "titulo": course.titulo, "price": course.price, "start_date": course.start_date.strftime('%Y-%m-%d'), "end_date": course.end_date.strftime('%Y-%m-%d'), "adittional_info": course.adittional_info, "description": course.description, "tags": course.tags, "vacancies": course.vacancies, "ubicacion": json.loads(course.ubicacion), "min_age": course.min_age}}),
+            return jsonify({"success": True, 
+                            "message": "Curso creado exitosamente", 
+                            "data": {"id": course.id, 
+                                     "id_service": service.id,
+                                       "titulo": course.titulo, 
+                                       "price": course.price, 
+                                       "start_date": course.start_date.strftime('%Y-%m-%d'), 
+                                       "end_date": course.end_date.strftime('%Y-%m-%d'),
+                                         "adittional_info": course.adittional_info, 
+                                         "description": course.description,
+                                        "tags": course.tags,
+                                        "vacancies": course.vacancies,
+                                        "ubicacion": json.loads(course.ubicacion),
+                                        "min_age": course.min_age,
+                                        "images": [],  
+                                        }}), 201
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "message": f"Error al crear curso: {str(e)}"}), 500 
+        return jsonify({"success": False, 
+                        "message": f"Error al crear curso: {str(e)}"}), 500 
 
 
 @cursos_bp.route('/company/courses/<int:id>', methods=['PUT'])

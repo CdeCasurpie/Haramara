@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import HaramaraButton from '@/components/HaramaraButton';
 import { Car, XIcon } from 'lucide-react';
 import { fetchCourses, createCourse } from './utils';
+import CustomSlider from '../business-components/CustomSlider';
 
 export default function Cursos() {
     const [activeTab, setActiveTab] = useState('formulario');
@@ -16,7 +17,6 @@ export default function Cursos() {
     const [isCreating, setIsCreating] = useState(true);
     const [currentCourse, setCurrentCourse] = useState(null);
     const [courseData, setCourseData] = useState(null);
-    //const [infoCursos, setInfoCursos] = useState([]);
     const [state, setState] = useState(() => {
         if(isCreating){
             return "creating";
@@ -54,7 +54,7 @@ export default function Cursos() {
         days: [false, false, false, false, false, false, false],
     });
     const [newTurnos, setNewTurnos] = useState([]);
-    const [infoCursos, setInfoCursos] = useState(null);
+    const [infoCursos, setInfoCursos] = useState([]);
     const [loading, setLoading] = useState(true);
 
 
@@ -70,8 +70,6 @@ export default function Cursos() {
             }
         };
         fetchInfoCursos();
-
-
     }, []);
 
 
@@ -80,22 +78,8 @@ export default function Cursos() {
         if (isCreating) {
             try {
                 const newCourse = await createCourse(courseData);
-                console.log("Curso creado:", courseData);
-                /*
-                - title
-                - price
-                - startDate
-                - endDate
-                - message
-                - description
-                - tags
-                - vacancies
-                - location
-                - images
-                - minAge
-                - images
-                */
-               
+                console.log("Curso creado:", newCourse.data);
+                setInfoCursos([...infoCursos, newCourse.data]);
                     
             } catch (error) {
                 console.error("Error en createActivity:", error);
@@ -108,7 +92,7 @@ export default function Cursos() {
         console.log("Turnos a crear", newTurnos);
 
         // limpiando datos
-        /*
+        
         setCourseData(null);
         setNewTurnos([]);
         setIsEditing(false);
@@ -116,7 +100,7 @@ export default function Cursos() {
         setCurrentCourse(null);
         setActiveTab('formulario');
         setState("normal");
-        */
+        
         
     };
 
@@ -159,19 +143,6 @@ export default function Cursos() {
         setIsCreating(true);
         setActiveTab('formulario');
     }
-/*
-    images: '',
-    title: '',
-    startDate: '',
-    endDate: '',
-    price: '',
-    message: '',
-    location: '',
-    description: '',
-    minAge: '',
-    vacancies: '',
-    tags: '',
-*/
 
     const [days, setDays] = useState([false, false, false, false, false, false, false]);
 
@@ -192,7 +163,7 @@ export default function Cursos() {
                     loading ? (
                         <p>Cargando cursos...</p>
                     ) : (
-                        <>
+                        <CustomSlider title='' showBorder={false} itemHeight={140}>
                         {infoCursos.map((info) => {
                             return (<CourseCard
                             key={info.id}
@@ -217,7 +188,7 @@ export default function Cursos() {
                             />)
                         })}
 
-                        </>
+                        </CustomSlider>
                     )
                 }
 

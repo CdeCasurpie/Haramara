@@ -28,7 +28,7 @@ export default function CourseCard({ info, setCurrentCourse, setIsEditing }) {
     return (
         <div
             className={styles.container}
-            style={{ transform: info.business ? "scale(0.9)" : "scale(1)" }}
+    
             >
 
             <div className={styles.imageContainer}>
