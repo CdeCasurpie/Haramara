@@ -44,7 +44,7 @@ const BusinessSideBar = ({ initialActive = 0, setActiveState }) => {
     { icon: <LucideLayoutDashboard size={22} />, text: 'Dashboard', id: 0 },
     { icon: <ActivityIcon size={22} />, text: 'Actividades', id: 1 },
     { icon: <Book size={22} />, text: 'Cursos', id: 2 },
-   /*  { icon: <ShoppingBag size={22} />, text: 'Productos', id: 3 }, */
+    { icon: <ShoppingBag size={22} />, text: 'Productos', id: 3 },
     { icon: <CircleUser size={22} />, text: 'Mis Datos', id: 4 },
     { icon: <BellPlus size={22} />, text: 'Anuncios', id: 5 },
   ];

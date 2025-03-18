@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import LeafletLocationSelector from './LocationSelector';
 import styles from './LocationField.module.css';
 
 const LocationField = ({
-  initialLocation = null,
+  initialLocation,
   initialAddress = '',
   onLocationSelect,
   placeholder = 'Ingresa una dirección'
@@ -14,6 +14,16 @@ const LocationField = ({
   const [address, setAddress] = useState(initialAddress || '');
   const [location, setLocation] = useState(initialLocation);
   const modalRef = useRef(null);
+
+
+  useEffect(() => {
+    setLocation(initialLocation);
+    if (initialLocation) {
+      setAddress(initialLocation.address || `${initialLocation.lat.toFixed(5)}, ${initialLocation.lng.toFixed(5)}`);
+    } else {
+      setAddress('');
+    }
+  }, [initialLocation]);
 
   // Manejar la selección de ubicación desde el mapa
   const handleLocationSelect = (selectedLocation) => {

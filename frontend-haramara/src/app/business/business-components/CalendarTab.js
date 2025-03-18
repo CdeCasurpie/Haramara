@@ -6,25 +6,30 @@ import WeekCalendar from './WeekCalendar';
 
 const CalendarTab = ({ 
   activityId,
-  initialShifts = [] 
-}) => {
-  const [shifts, setShifts] = useState(initialShifts);
-  const [newShift, setNewShift] = useState({
+  activityShifts,
+  setActivityShifts,
+  initialCurrentShift = {
     day: 'Lunes',
     startTime: '',
     endTime: '',
     startDate: '',
     endDate: '',
     availableSlots: '',
-    id_activity: activityId
+    id_activity: ''
+  }
+}) => {
+  // Estado solo para el turno que se está editando actualmente
+  const [currentShift, setCurrentShift] = useState({
+    ...initialCurrentShift,
+    id_activity: activityId || initialCurrentShift.id_activity
   });
   
   // Calcular fechas para el calendario
   const calcDates = () => {
-    if (shifts.length > 0) {
+    if (activityShifts.length > 0) {
       // Usar las fechas de los turnos existentes
-      const startDates = shifts.map(s => new Date(s.startDate));
-      const endDates = shifts.map(s => new Date(s.endDate));
+      const startDates = activityShifts.map(s => new Date(s.startDate));
+      const endDates = activityShifts.map(s => new Date(s.endDate));
       return {
         startDate: new Date(Math.min(...startDates)),
         endDate: new Date(Math.max(...endDates))
@@ -41,10 +46,6 @@ const CalendarTab = ({
     }
   };
 
-  const handleNewShiftChange = (updatedShift) => {
-    setNewShift(updatedShift);
-  };
-
   const handleAddShift = (shiftData) => {
     // Validación básica
     if (!shiftData.startTime || !shiftData.endTime || !shiftData.startDate || !shiftData.endDate) {
@@ -58,10 +59,11 @@ const CalendarTab = ({
       id: Date.now() // Usar timestamp como ID temporal
     };
     
-    setShifts([...shifts, newShiftWithId]);
+    // Actualizar el estado de turnos que viene desde fuera
+    setActivityShifts([...activityShifts, newShiftWithId]);
     
     // Resetear el formulario
-    setNewShift({
+    setCurrentShift({
       day: 'Lunes',
       startTime: '',
       endTime: '',
@@ -74,20 +76,20 @@ const CalendarTab = ({
 
   const handleDeleteShift = (shiftId) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este turno?')) {
-      setShifts(shifts.filter(shift => shift.id !== shiftId));
+      setActivityShifts(activityShifts.filter(shift => shift.id !== shiftId));
     }
   };
 
   return (
     <>
       <ShiftForm 
-        initialData={newShift}
-        setInitialData={handleNewShiftChange}
+        activityShift={currentShift}
+        setActivityShift={setCurrentShift}
         onSubmit={handleAddShift}
       />
       <br style={{height: '20px'}}></br>
       <WeekCalendar 
-        shifts={shifts} 
+        shifts={activityShifts} 
         onDeleteShift={handleDeleteShift} 
         dates={calcDates()}
       />

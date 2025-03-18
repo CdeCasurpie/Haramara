@@ -39,20 +39,20 @@ export default function AuthForm({
       <div className={styles.inputContainer}>
         {fields.map((field) =>
           field.type === "radio" ? (
-            <div key={field.name} className={styles.selectorContainer}>
-              <label className={styles.labelSelect}>{field.label}</label>
-              <div className={styles.selector}>
+            <div key={field.name} className={styles.radioContainer}>
+              <label className={styles.radioLabel}>{field.label}</label>
+              <div className={styles.radioGroup}>
                 {field.options.map((option) => (
-                  <label key={option.value} className={styles.labelSelect}>
+                  <label key={option.value} className={styles.radioOption}>
                     <input
-                      className={styles.inputSelect}
                       type="radio"
                       name={field.name}
                       value={option.value}
                       checked={formData[field.name] === option.value}
                       onChange={handleChange}
                     />
-                    {option.label}
+                    <span className={styles.radioCheckmark}></span>
+                    <span className={styles.radioOptionLabel}>{option.label}</span>
                   </label>
                 ))}
               </div>
