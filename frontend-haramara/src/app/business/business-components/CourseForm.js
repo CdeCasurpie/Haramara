@@ -25,25 +25,25 @@ const CourseForm = ({
 }) => {
   const [course, setCourse] = useState(initialData);
   const fileInputRef = useRef(null);
-  const prevInitialData = useRef(initialData);
+  const [prevInitialData, setPrevInitialData] = useState(initialData);
 
   useEffect(() => {
     if (state == "normal") {
       setCourse(initialData);
       setState("creating");
     }
-  }, [state, initialData]);
+  }, [state]);
 
   useEffect(() => {
     if (setCourseData) {
       setCourseData(course);
     }
-  }, [course, setCourseData]);
+  }, [course]);
 
   useEffect(() => {
-    if (JSON.stringify(initialData) !== JSON.stringify(prevInitialData.current)) {
+    if (JSON.stringify(initialData) !== JSON.stringify(prevInitialData)) {
         setCourse(initialData);
-        prevInitialData.current = initialData;
+        setPrevInitialData(initialData);
     }
 }, [initialData]);
 
@@ -52,7 +52,7 @@ const CourseForm = ({
     const { name, value } = e.target;
     setCourse({
       ...course,
-      [name]: value
+      [name]: value || ""
     });
   };
 
@@ -60,7 +60,7 @@ const CourseForm = ({
     const handleLocationSelect = (location) => {
       setCourse({
         ...course,
-        location: location
+        location: location || ""
       });
     };
   

@@ -3,6 +3,7 @@ from app.auth import auth_bp
 from app.auth.utils import *
 from flask import jsonify, request
 from flask_jwt_extended import set_access_cookies, jwt_required, get_jwt_identity, get_jwt
+from app.utils import *
 @auth_bp.route('/auth')
 def auth():
     return 'Auth! Hello from auth_bp'

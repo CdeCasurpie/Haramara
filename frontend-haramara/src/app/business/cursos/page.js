@@ -7,8 +7,8 @@ import TurnoCurso from "@/components/TurnoCurso";
 import styles from './Cursos.module.css';
 import { useEffect, useState } from 'react';
 import HaramaraButton from '@/components/HaramaraButton';
-import { XIcon } from 'lucide-react';
-import { fetchCourses } from "./utils";
+import { Car, XIcon } from 'lucide-react';
+import { fetchCourses, createCourse } from './utils';
 
 export default function Cursos() {
     const [activeTab, setActiveTab] = useState('formulario');
@@ -54,18 +54,52 @@ export default function Cursos() {
         days: [false, false, false, false, false, false, false],
     });
     const [newTurnos, setNewTurnos] = useState([]);
+    const [infoCursos, setInfoCursos] = useState(null);
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
-        
-        console.log("Cursos obtenidos:", fetchCourses());
+        const fetchInfoCursos = async () => {
+            try {
+                const data = await fetchCourses();
+                setInfoCursos(data);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error en fetchInfoCursos:", error);
+                setLoading(false);
+            }
+        };
+        fetchInfoCursos();
+
 
     }, []);
 
 
-    const handleCourseSubmit = (courseData) => {
+    const handleCourseSubmit = async (courseData) => {
         console.log("Datos del curso enviados:", courseData);
         if (isCreating) {
-            console.log("Creando curso");
+            try {
+                const newCourse = await createCourse(courseData);
+                console.log("Curso creado:", courseData);
+                /*
+                - title
+                - price
+                - startDate
+                - endDate
+                - message
+                - description
+                - tags
+                - vacancies
+                - location
+                - images
+                - minAge
+                - images
+                */
+               
+                    
+            } catch (error) {
+                console.error("Error en createActivity:", error);
+            }
         } else if (isEditing) {
             console.log("Editando curso");
         }
@@ -74,6 +108,7 @@ export default function Cursos() {
         console.log("Turnos a crear", newTurnos);
 
         // limpiando datos
+        /*
         setCourseData(null);
         setNewTurnos([]);
         setIsEditing(false);
@@ -81,6 +116,8 @@ export default function Cursos() {
         setCurrentCourse(null);
         setActiveTab('formulario');
         setState("normal");
+        */
+        
     };
 
     const handleTabChange = (tab) => {
@@ -135,44 +172,6 @@ export default function Cursos() {
     vacancies: '',
     tags: '',
 */
-    
-    const infoCursos = [
-        {
-            id: 1,
-            imagesList: [],
-            title: "curso de natacion",
-            startDate: "2025-02-24",
-            endDate: "2025-02-26",
-            price: 100,
-            message: "Principiante",
-            location: "Cusquito",
-            description: "Aprende a nadar con los mejores",
-            minAge: 18,
-            business: true,
-            total_revenue: 1500,
-            num_reservations: 10,
-            tags: "#natacion #deporte #agua",
-        },
-        {
-            id: 2,
-            imagesList: [],
-            title: "Curso de prueba",
-            startDate: "2025-02-24",
-            endDate: "2025-02-26",
-            price: 100,
-            message: "Principiante",
-            location: "Cusquito",
-            description: "Aprende a nadar con los mejores",
-            minAge: 18,
-            business: true,
-            total_revenue: 1500,
-            num_reservations: 10,
-            tags: "#natacion #deporte #agua",
-        }
-    ]
-
-
-
 
     const [days, setDays] = useState([false, false, false, false, false, false, false]);
 
@@ -189,9 +188,39 @@ export default function Cursos() {
                         </HaramaraButton>
                     </div>
                 </div>
-                {infoCursos.map((info) => (
-                    <CourseCard key={info.id} info={info} setCurrentCourse={setCurrentCourse} setIsEditing={setIsEditing} />
-                ))}
+                {
+                    loading ? (
+                        <p>Cargando cursos...</p>
+                    ) : (
+                        <>
+                        {infoCursos.map((info) => {
+                            return (<CourseCard
+                            key={info.id}
+                            info={
+                                {
+                                    id: info.id,
+                                    images: info.images,
+                                    title: info.titulo,
+                                    startDate: info.start_date,
+                                    endDate: info.end_date,
+                                    minAge: info.min_age,
+                                    location: null,
+                                    price: info.price,
+                                    level: info.level,
+                                    business: true,
+                                    total_revenue: 1000,
+                                    num_reservations: 10,
+                                }
+                            }
+                            setCurrentCourse={setCurrentCourse}
+                            setIsEditing={setIsEditing}
+                            />)
+                        })}
+
+                        </>
+                    )
+                }
+
 
             </div>
             <div style={{ width: "45%" }}>
@@ -228,7 +257,7 @@ export default function Cursos() {
                                         price: currentCourse.price,
                                         message: currentCourse.message,
                                         location: currentCourse.location,
-                                        images: currentCourse.imagesList,
+                                        images: currentCourse.images,
                                         description: currentCourse.description,
                                         minAge: currentCourse.minAge,
                                         vacancies: currentCourse.vacancies,
@@ -289,7 +318,7 @@ export default function Cursos() {
 
                 <div className={styles.footerPanel}>
                     <HaramaraButton className={styles.buttonSave} onClick={() => handleCourseSubmit(courseData)}>
-                        {isCreating ? 'Crear Curso' : (isEditing ? 'Guardar Cambios' : 'Enviar Datos')}
+                        {isEditing ? 'Guardar Cambios' : (isCreating ? 'Crear Curso' : 'Enviar Datos')}
                     </HaramaraButton>
                 </div>
             </div>

@@ -230,7 +230,7 @@ class Courses(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_service = db.Column(db.Integer, db.ForeignKey('services.id'))
     titulo = db.Column(db.String(120), nullable=False)
-    id_ubicacion = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+    ubicacion = db.Column(db.String(512), nullable=False)
     price = db.Column(db.Float, nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
@@ -238,6 +238,7 @@ class Courses(db.Model):
     description = db.Column(db.String(800), nullable=False)
     tags = db.Column(db.String(120), nullable=False)
     vacancies = db.Column(db.Integer, nullable=False)
+    min_age = db.Column(db.Integer, nullable=False)
 
     def save(self):
         db.session.add(self)

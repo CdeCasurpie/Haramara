@@ -1,10 +1,11 @@
+import  API_BASE_URL from "@/config";
+
 const fetchCourses = async () => {
     try {
-      const response = await fetch("http://tu-servidor.com/company/courses", {
+      const response = await  fetch(`${API_BASE_URL}/company/courses`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Se envía el token en el header
+          "Content-Type": "application/json"
         },
         mode: "cors",
         credentials: "include",
@@ -24,5 +25,80 @@ const fetchCourses = async () => {
       return [];
     }
   };
+
+//create course
+/*
+front:
+    - title
+    - price
+    - startDate
+    - endDate
+    - message
+    - description
+    - tags
+    - vacancies
+    - location
+    - images
+    - minAge
+    - images
+
+
+back:
+    - titulo
+    - price
+    - start_date
+    - end_date
+    - adittional_info
+    - description
+    - tags
+    - vacancies
+    - ubicacion
+    - min_age
+
+*/
+
+const createCourse = async (courseData) => {
+    console.log("kk");
+    const requestData = {
+        titulo: courseData.title,
+        price: courseData.price,
+        start_date: courseData.startDate,
+        end_date: courseData.endDate,
+        adittional_info: courseData.message,
+        description: courseData.description,
+        tags: courseData.tags,
+        vacancies: courseData.vacancies,
+        ubicacion: courseData.location,
+        min_age: courseData.minAge,
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/company/courses`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            mode: "cors",
+            credentials: "include",
+            body: JSON.stringify(requestData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            console.log("inka cola");
+            console.log(data)
+            return data
+        } else {
+            console.error("Error creando cursoXXX:", data.message);
+            return null;
+        }
+    } catch (error) {
+        console.error("Error en la peticiónZZZZZZZZZ:", error);
+        return null;
+    }
+}
   
-export { fetchCourses };
+
+
+export { fetchCourses , createCourse};

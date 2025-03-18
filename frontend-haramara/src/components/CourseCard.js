@@ -32,7 +32,7 @@ export default function CourseCard({ info, setCurrentCourse, setIsEditing }) {
             >
 
             <div className={styles.imageContainer}>
-                <Gallery images={info.imagesList} />
+                <Gallery images={info.images} />
             </div>
 
             <div className={styles.infoContainer}>
@@ -81,7 +81,7 @@ export default function CourseCard({ info, setCurrentCourse, setIsEditing }) {
                     info.business ? (
                         <div className={styles.rightBusiness}>
                             <div className={styles.editContainer}
-                                onClick={() =>{ setCurrentCourse(info); setIsEditing(true);}}
+                                onClick={() =>{ setCurrentCourse(info); setIsEditing(true); }}
                             >
                                 <Image
                                     src="/images/general/edit.svg"

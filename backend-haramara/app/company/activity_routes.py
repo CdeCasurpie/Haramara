@@ -200,7 +200,7 @@ def create_activity():
             tags=data.get('tags', '')
         )
         activity.save()
-        
+            
         # Procesar imágenes si existen
         if 'images' in data and isinstance(data['images'], list):
             for image_data in data['images']:

@@ -3,32 +3,6 @@ from app.models import db
 from app.models import Users, Companies, Locations, TemporalCompanies, TemporalLocations
 from datetime import timedelta
 
-def get_post_data(request, required_fields=None):
-    """
-    Obtiene los datos enviados por el cliente y revisa si los campos requeridos están presentes
-    """
-
-    data = {}
-
-    # obtiene json
-    try:
-        data = request.get_json()
-    except Exception as e:
-        print(e)
-        return None, []
-    
-
-    # Campos requeridos
-    missing = []
-    if required_fields:
-        for field in required_fields:
-            if field not in data:
-                missing.append(field)
-    if missing:
-        return None, missing
-
-    return data, []
-
 
 def is_valid_email(email):
     """
@@ -57,13 +31,6 @@ def search_company(email):
     company = Companies.query.filter_by(email=email).first()
     return company
 
-
-def search_location(new_location):
-    """
-    Busca una ubicacion en la base de datos
-    """
-    location = Locations.query.filter_by(address=new_location.address, country=new_location.country, comunity=new_location.comunity, province=new_location.province, postal_code=new_location.postal_code).first()
-    return location
 
 def generate_token(user_id, type):
     """
