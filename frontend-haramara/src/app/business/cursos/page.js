@@ -12,17 +12,66 @@ import { XIcon } from 'lucide-react';
 export default function Cursos() {
     const [activeTab, setActiveTab] = useState('formulario');
     const [isEditing, setIsEditing] = useState(false);
-    const [isCreating, setIsCreating] = useState(false);
+    const [isCreating, setIsCreating] = useState(true);
     const [currentCourse, setCurrentCourse] = useState(null);
-
-    useEffect(() => {
-        if (isEditing) {
-            console.log("Editando curso", currentCourse);
+    const [courseData, setCourseData] = useState(null);
+    const [state, setState] = useState(() => {
+        if(isCreating){
+            return "creating";
+        }else if(isEditing){
+            return "editing";
+        }else{
+            return "normal";
         }
-    }, [currentCourse]);
+    });
+    const [turnos, setTurnos] = useState(
+        [
+            {
+                id: 1,
+                courseId: 1,
+                startTime: "08:00",
+                endTime: "09:00",
+                initialDays: [false, false, true, false, true, false, true],
+                numReservations: 10,
+                handleStudents: () => console.log("Ver alumnos"),
+            },
+            {
+                id: 2,
+                courseId: 1,
+                startTime: "08:00",
+                endTime: "09:00",
+                initialDays: [false, false, true, false, true, false, true],
+                numReservations: 10,
+                handleStudents: () => console.log("Ver alumnos"),
+            }
+        ]
+    );
+    const [TurnosFormData, setTurnosFormData] = useState({
+        startTime: '',
+        endTime: '',
+        days: [false, false, false, false, false, false, false],
+    });
+    const [newTurnos, setNewTurnos] = useState([]);
 
     const handleCourseSubmit = (courseData) => {
         console.log("Datos del curso enviados:", courseData);
+        if (isCreating) {
+            console.log("Creando curso");
+        } else if (isEditing) {
+            console.log("Editando curso");
+        }
+
+        // creando turnos de golpe
+        console.log("Turnos a crear", newTurnos);
+
+        // limpiando datos
+        setCourseData(null);
+        setNewTurnos([]);
+        setIsEditing(false);
+        setIsCreating(false);
+        setCurrentCourse(null);
+        setActiveTab('formulario');
+        setState("normal");
     };
 
     const handleTabChange = (tab) => {
@@ -30,7 +79,39 @@ export default function Cursos() {
     };
 
     const handleInputChange = (e) => {
-        console.log(e.target.value);
+        setTurnosFormData(
+            {
+                ...TurnosFormData,
+                [e.target.name]: e.target.value
+            }
+        )
+    }
+
+    const handleTurnoAddSubmit = (e) => {
+        e.preventDefault();
+        console.log("Añadir turno", TurnosFormData);
+        setTurnos([...turnos, {
+            id: turnos.length + 1,
+            courseId: 1,
+            startTime: TurnosFormData.startTime,
+            endTime: TurnosFormData.endTime,
+            initialDays: days,
+            numReservations: 0,
+            handleStudents: () => console.log("Ver alumnos"),
+        }]);
+        setNewTurnos([...newTurnos, {
+            id_course: currentCourse.id,
+            start_time: TurnosFormData.startTime,
+            end_time: TurnosFormData.endTime,
+            frequency: days,
+        }]);
+    }
+
+    const handleCreateCourse = () => {
+        setIsEditing(false);
+        setCurrentCourse(null);
+        setIsCreating(true);
+        setActiveTab('formulario');
     }
 /*
     images: '',
@@ -81,26 +162,8 @@ export default function Cursos() {
         }
     ]
 
-    const infoTurnos = [
-        {
-            id: 1,
-            activityId: 1,
-            startTime: "08:00",
-            endTime: "09:00",
-            initialDays: [false, false, true, false, true, false, true],
-            numReservations: 10,
-            handleStudents: () => console.log("Ver alumnos"),
-        },
-        {
-            id: 2,
-            activityId: 1,
-            startTime: "08:00",
-            endTime: "09:00",
-            initialDays: [false, false, true, false, true, false, true],
-            numReservations: 10,
-            handleStudents: () => console.log("Ver alumnos"),
-        }
-    ]
+
+
 
     const [days, setDays] = useState([false, false, false, false, false, false, false]);
 
@@ -111,9 +174,14 @@ export default function Cursos() {
                     <div style = {{fontSize: '1.3rem', fontWeight: '400', marginBottom: '1rem', color: 'black'}}>
                     Cursos Creados:
                     </div>
+                    <div styles={{width: 'auto'}}>
+                        <HaramaraButton className={styles.buttonSave} onClick={handleCreateCourse} variant="principal">
+                            + Crear nuevo curso
+                        </HaramaraButton>
+                    </div>
                 </div>
                 {infoCursos.map((info) => (
-                    <CourseCard key={info.id} info={info} setCurrentCourse={setCurrentCourse} />
+                    <CourseCard key={info.id} info={info} setCurrentCourse={setCurrentCourse} setIsEditing={setIsEditing} />
                 ))}
 
             </div>
@@ -146,21 +214,25 @@ export default function Cursos() {
                                     currentCourse ? {
                                         id: currentCourse.id,
                                         title: currentCourse.title,
-                                        start_date: currentCourse.start_date,
-                                        end_date: currentCourse.end_date,
+                                        startDate: currentCourse.startDate,
+                                        endDate: currentCourse.endDate,
                                         price: currentCourse.price,
                                         message: currentCourse.message,
                                         location: currentCourse.location,
-                                        images: currentCourse.images,
+                                        images: currentCourse.imagesList,
                                         description: currentCourse.description,
-                                        min
+                                        minAge: currentCourse.minAge,
+                                        vacancies: currentCourse.vacancies,
+                                        tags: currentCourse.tags,
                                     } : undefined
                                 }
-                                setInitialData={setCurrentCourse}
+                                setCourseData={setCourseData}
+                                state={state}
+                                setState={setState}
                             />
                         </div>
                     ) : (
-                        <div className={styles.turnosContenido}>
+                        <form className={styles.turnosContenido} onSubmit={handleTurnoAddSubmit}>
                         <div className={styles.formTurnos}>
                             <div className={styles.formRow}>
                                 <div className={styles.formGroup}>
@@ -169,38 +241,48 @@ export default function Cursos() {
                                         type="time"
                                         name="startTime"
                                         className={styles.input}
+                                        value={TurnosFormData.startTime}
                                         onChange={handleInputChange}
                                         placeholder="Mensaje adicional"
+                                        required
                                     />
                                 </div>  
                                 <div className={styles.formGroup}>
                                     <label className={styles.label}>Hora de fin: </label>
                                     <input
                                         type="time"
-                                        name="endtTime"
+                                        name="endTime"
                                         className={styles.input}
+                                        value={TurnosFormData.endTime}
                                         onChange={handleInputChange}
                                         placeholder="Mensaje adicional"
+                                        required
                                     />
                                 </div>  
                             </div>
                             <div className={styles.formRow}>
                             <Days days={days} setDays={setDays} editing={true} />
-                            <HaramaraButton className={styles.buttonSave}>
+                            <HaramaraButton className={styles.buttonSave} type="submit">
                                 Añadir Turno +
                             </HaramaraButton>
                             </div>
                         </div>
                         <div className={styles.turnosContainer}>
                             {
-                                infoTurnos.map((turno) => (
+                                turnos.map((turno) => (
                                     <TurnoCurso key={turno.id} turno={turno} />
                                 ))
                             }
                         </div>
-                        </div>
+                        </form>
                     )
                 }
+
+                <div className={styles.footerPanel}>
+                    <HaramaraButton className={styles.buttonSave} onClick={() => handleCourseSubmit(courseData)}>
+                        {isCreating ? 'Crear Curso' : (isEditing ? 'Guardar Cambios' : 'Enviar Datos')}
+                    </HaramaraButton>
+                </div>
             </div>
             </div>
         </div>

@@ -18,17 +18,34 @@ const CourseForm = ({
     vacancies: '',
     tags: '',
   },
-  setInitialData,
+  setCourseData,
   onSubmit,
+  state,
+  setState
 }) => {
   const [course, setCourse] = useState(initialData);
   const fileInputRef = useRef(null);
+  const prevInitialData = useRef(initialData);
 
   useEffect(() => {
-    if (setInitialData) {
-      setInitialData(course);
+    if (state == "normal") {
+      setCourse(initialData);
+      setState("creating");
     }
-  }, [course, setInitialData]);
+  }, [state, initialData]);
+
+  useEffect(() => {
+    if (setCourseData) {
+      setCourseData(course);
+    }
+  }, [course, setCourseData]);
+
+  useEffect(() => {
+    if (JSON.stringify(initialData) !== JSON.stringify(prevInitialData.current)) {
+        setCourse(initialData);
+        prevInitialData.current = initialData;
+    }
+}, [initialData]);
 
   // Manejar cambios en los campos principales
   const handleInputChange = (e) => {
@@ -90,13 +107,6 @@ const CourseForm = ({
     fileInputRef.current.click();
   };
 
-  // Crear el curso
-  const handleCreateCourse = () => {
-    if (onSubmit) {
-      onSubmit(course);
-    }
-  };
-
   return (
     <div className={styles.formContainer}>
     {/* Primera fila: Título */}
@@ -114,7 +124,7 @@ const CourseForm = ({
 
     {/* Segunda fila: fecha y precio */}
     <div className={styles.formRow}>
-      <div className={styles.formGroup + ' ' + styles.width47percentage}>
+      <div className={styles.formGroup + ' ' + styles.width62percentage}>
       <label className={styles.label}>Fecha inicio - fin:</label>
       <div className={styles.formRow}>
         <input
@@ -135,7 +145,7 @@ const CourseForm = ({
         />
       </div>
       </div>
-      <div className={styles.formGroup + ' ' + styles.width47percentage}>
+      <div className={styles.formGroup + ' ' + styles.width30percentage}>
       <label className={styles.label}> Precio:</label>
       <input
           type="text"
@@ -177,7 +187,7 @@ const CourseForm = ({
     <div className={styles.formGroup + ' ' + styles.width47percentage}>
         <label className={styles.label}>Edad mínima: </label>
         <input
-            type="text"
+            type="number"
             name="minAge"
             className={styles.input}
             value={course.minAge}
@@ -268,17 +278,6 @@ const CourseForm = ({
             onChange={handleInputChange}
             placeholder="Descripción detallada del curso"
         />
-    </div>
-
-    {/* Botón de crear */}
-    <div className={styles.formFooter}>
-      <button 
-        type="button" 
-        className={styles.createButton}
-        onClick={handleCreateCourse}
-      >
-        Crear actividad
-      </button>
     </div>
   </div> 
   );

@@ -4,6 +4,7 @@ import Days from './Days';
 import styles from './TurnoCurso.module.css';
 import Image from 'next/image';
 import { CheckCircle } from 'react-bootstrap-icons';
+import { DeleteIcon } from 'lucide-react';
 
 export default function TurnoCurso({turno}) {
     /*
@@ -21,6 +22,10 @@ export default function TurnoCurso({turno}) {
 
     const handleConfirmTurno = () => {
         console.log("Confirmar turno", days);
+    };
+
+    const handleDeleteTurno = (id) => {
+        console.log("Eliminar turno", id);
     };
 
     return (
@@ -50,7 +55,8 @@ export default function TurnoCurso({turno}) {
                     <div className={styles.students} onClick={turno.handleStudents}>
                         ver alumnos
                     </div>
-                </div>    
+                </div>   
+                <DeleteIcon size={20} color="red" onClick={() => handleDeleteTurno(turno.id)} />
             </div>
         </div>
     );
