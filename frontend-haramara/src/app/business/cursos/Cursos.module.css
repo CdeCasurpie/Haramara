@@ -1,35 +1,37 @@
+/* Cursos.module.css */
 .container {
-  width: 100%;
   display: flex;
-  flex-direction: row;
-  padding: 0;
-  margin: 0;
+  width: 100%;
   height: 100%;
 }
-  
+
+.formRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .formularioContainer {
-  flex-grow: 1;
+  padding: 30px;
+  height: 80%;
   overflow-y: auto;
 }
 
-  .formPanel {
-    width: 100%;
-    overflow-y: auto;
-    background-color: white;
-    position: relative;
-    overflow-x: hidden;
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    height: 100%;
-    
-  }
+.formPanel {
+  width: 100%;
+  background-color: white;
+  position: relative;
+  overflow-x: hidden;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  border: 1px solid var(--border-color);
+  height: 100%;
+}
 
-  
-  .tabsContainer {
+.tabsContainer {
   display: flex;
   border-bottom: 1px solid #e5e7eb;
   background-color: white;
@@ -60,12 +62,11 @@
   color: #0052cc;
 }
 
-
 .footerPanel {
   height: 10%;
-  padding: 10px;
+  padding: 16px;
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   border-top: 1px solid var(--border-color);
 }
 
@@ -96,6 +97,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .turnosContenido {
@@ -107,41 +109,136 @@
   overflow-y: auto;
   gap: 1rem;
   width: 100%;
+  height: 80%;
 }
 
 .label {
-    font-size: 14px;
-    color: rgba(0, 0, 0, 0.5);
-    font-weight: 500;
-  }
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: 500;
+}
 
 .input, .textarea, .select {
-    padding: 12px 16px;
-    border: 1px solid var(--border-color, var(--border-color));
-    border-radius: 8px;
-    font-size: 15px;
-    transition: border-color 0.2s;
-    background-color: white;
-    color: var(--text-color, #333);
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.2s;
+  background-color: white;
+  color: var(--text-color);
+  width: 100%;
 }
 
 .formGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    width: 47%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  width: 47%;
 }
 
 .formTurnos {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1.5rem;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
-.formRow {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+/* Nuevos estilos similares a Actividades */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 40px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.createButton {
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid var(--primary-color);
+  transition: all 0.2s;
+}
+
+.createButton:hover {
+  background: white;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  transition: all 0.2s;
+}
+
+.plusIcon {
+  margin-right: 4px;
+}
+
+/* Estilos para el panel de actividades */
+.halfWidth {
+  width: 50%;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* Checkboxes toggle style */
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.checkbox {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.checkboxToggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+  background-color: #e5e7eb;
+  border-radius: 34px;
+  transition: background-color 0.3s;
+  margin-right: 10px;
+}
+
+.checkbox:checked + .checkboxToggle {
+  background-color: var(--secondary-color);
+}
+
+.checkboxToggle:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.checkbox:checked + .checkboxToggle:before {
+  transform: translateX(22px);
+}
+
+.checkboxLabel {
+  color: var(--text-color);
+  font-size: 0.9rem;
 }

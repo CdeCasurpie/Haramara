@@ -5,7 +5,8 @@ const fetchCourses = async () => {
       const response = await  fetch(`${API_BASE_URL}/company/courses`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
         },
         mode: "cors",
         credentials: "include",
@@ -60,16 +61,16 @@ back:
 const createCourse = async (courseData) => {
     console.log("kk");
     const requestData = {
-        titulo: courseData.title,
+        titulo: courseData.titulo,
         price: courseData.price,
-        start_date: courseData.startDate,
-        end_date: courseData.endDate,
-        adittional_info: courseData.message,
+        start_date: courseData.start_date,
+        end_date: courseData.end_date,
+        adittional_info: courseData.adittional_info,
         description: courseData.description,
         tags: courseData.tags,
         vacancies: courseData.vacancies,
         ubicacion: courseData.location,
-        min_age: courseData.minAge,
+        min_age: courseData.min_age,
     }
 
     try {
@@ -77,6 +78,7 @@ const createCourse = async (courseData) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
             },
             mode: "cors",
             credentials: "include",
