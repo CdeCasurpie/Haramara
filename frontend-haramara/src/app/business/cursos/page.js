@@ -8,6 +8,7 @@ import styles from './Cursos.module.css';
 import { useEffect, useState } from 'react';
 import HaramaraButton from '@/components/HaramaraButton';
 import { XIcon } from 'lucide-react';
+import { fetchCourses } from "./utils";
 
 export default function Cursos() {
     const [activeTab, setActiveTab] = useState('formulario');
@@ -15,6 +16,7 @@ export default function Cursos() {
     const [isCreating, setIsCreating] = useState(true);
     const [currentCourse, setCurrentCourse] = useState(null);
     const [courseData, setCourseData] = useState(null);
+    //const [infoCursos, setInfoCursos] = useState([]);
     const [state, setState] = useState(() => {
         if(isCreating){
             return "creating";
@@ -52,6 +54,13 @@ export default function Cursos() {
         days: [false, false, false, false, false, false, false],
     });
     const [newTurnos, setNewTurnos] = useState([]);
+
+    useEffect(() => {
+        
+        console.log("Cursos obtenidos:", fetchCourses());
+
+    }, []);
+
 
     const handleCourseSubmit = (courseData) => {
         console.log("Datos del curso enviados:", courseData);
