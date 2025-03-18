@@ -5,7 +5,7 @@ import Price from './Price';
 import HaramaraButton from './HaramaraButton';
 
 
-export default function CourseCard({ info, setCurrentCourse }) {
+export default function CourseCard({ info, setCurrentCourse, setIsEditing }) {
     /*
     id,
     imageList,
@@ -28,11 +28,11 @@ export default function CourseCard({ info, setCurrentCourse }) {
     return (
         <div
             className={styles.container}
-            style={{ transform: info.business ? "scale(0.9)" : "scale(1)" }}
+    
             >
 
             <div className={styles.imageContainer}>
-                <Gallery images={info.imagesList} />
+                <Gallery images={info.images} />
             </div>
 
             <div className={styles.infoContainer}>
@@ -80,8 +80,8 @@ export default function CourseCard({ info, setCurrentCourse }) {
                 {
                     info.business ? (
                         <div className={styles.rightBusiness}>
-                            <div className={styles.editContaner}
-                                onClick={() => setCurrentCourse(info)}
+                            <div className={styles.editContainer}
+                                onClick={() =>{ setCurrentCourse(info); setIsEditing(true); }}
                             >
                                 <Image
                                     src="/images/general/edit.svg"

@@ -74,7 +74,7 @@ export default function Formulario() {
    
     <CourseCard info={{
       id: 1,
-      imagesList: [imageUrl],
+      images: [imageUrl],
       title: "Curso de prueba",
       startDate: "2025-02-24",
       endDate: "2025-02-26",

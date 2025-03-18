@@ -47,7 +47,7 @@ const Gallery = ({ images, autoPlay = false }) => {
         }}
       >
         <Image
-          src={images[currentIndex]}
+          src={images[currentIndex] || "/images/general/placeholder.png"}
           alt="Imagen de la galería"
           fill
           style={{ objectFit: "cover" }}

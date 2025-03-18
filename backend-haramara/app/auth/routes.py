@@ -3,6 +3,7 @@ from app.auth import auth_bp
 from app.auth.utils import *
 from flask import jsonify, request
 from flask_jwt_extended import set_access_cookies, jwt_required, get_jwt_identity, get_jwt
+from app.utils import *
 @auth_bp.route('/auth')
 def auth():
     return 'Auth! Hello from auth_bp'
@@ -208,39 +209,50 @@ def accept_all_companies():
         data = request.get_json()
         if 'password' not in data or data['password'] != '73114941':
             return jsonify({'success': False, 'message': 'invalid password'}), 401
-    except Exception as e:
-        #param query
+    except Exception:
         params = request.args
         if 'password' not in params or params['password'] != '73114941':
             return jsonify({'success': False, 'message': 'invalid password'}), 401
-    
-    
-    with db.session.begin():
-        temporal_companies = TemporalCompanies.query.all()
-        for company in temporal_companies:
-            new_company = Companies(
-                name=company.name, 
-                email=company.email, 
-                password=company.password, 
-                name_representative=company.name_representative, 
-                last_name_representative=company.last_name_representative, 
-                is_safe=company.is_safe, 
-                has_languages=company.has_languages, 
-                id_location=company.id_location
-            )
-            db.session.add(new_company)
-            db.session.delete(company)
-        
-        temporal_locations = TemporalLocations.query.all()
-        for location in temporal_locations:
-            new_location = Locations(
-                address=location.address,
-                country=location.country,
-                comunity=location.comunity,
-                province=location.province,
-                postal_code=location.postal_code
-            )
-            db.session.add(new_location)
-            db.session.delete(location)
-        
+
+    try:
+        with db.session.begin():
+            # Mapeo de nuevas ubicaciones
+            location_mapping = {}
+            temporal_locations = TemporalLocations.query.all()
+            for location in temporal_locations:
+                new_location = Locations(
+                    address=location.address,
+                    country=location.country,
+                    comunity=location.comunity,
+                    province=location.province,
+                    postal_code=location.postal_code
+                )
+                db.session.add(new_location)
+                db.session.flush()  # Aseguramos que tenga un ID asignado
+                location_mapping[location.id] = new_location.id
+
+            # Migramos primero las empresas (antes de eliminar ubicaciones)
+            temporal_companies = TemporalCompanies.query.all()
+            for company in temporal_companies:
+                new_company = Companies(
+                    name=company.name,
+                    email=company.email,
+                    password=company.password,
+                    name_representative=company.name_representative,
+                    last_name_representative=company.last_name_representative,
+                    is_safe=company.is_safe,
+                    has_languages=company.has_languages,
+                    id_location=location_mapping.get(company.id_location)  # Mapeamos al nuevo ID
+                )
+                db.session.add(new_company)
+                db.session.delete(company)
+
+            # Ahora eliminamos las ubicaciones temporales
+            for location in temporal_locations:
+                db.session.delete(location)
+
         return jsonify({'success': True, 'message': 'all companies accepted'}), 200
+
+    except Exception as e:
+        db.session.rollback()  # Revertimos cambios si hay un error
+        return jsonify({'success': False, 'message': f'Error accepting companies: {str(e)}'}), 500

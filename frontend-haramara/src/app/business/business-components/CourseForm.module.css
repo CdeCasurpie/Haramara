@@ -823,9 +823,13 @@
   .width35percentage {
     width: 35.5%;
   }
+
+  .width30percentage {
+    width: 30%;
+  }
   
-  .width60percentage {
-    width: 60.5%;
+  .width62percentage {
+    width: 62.5%;
   }
   
   @media (max-width: 768px) {
@@ -836,7 +840,7 @@
     .characteristicItem {
       flex-basis: 100%;
     }
-    .width40percentage, .width55percentage, .width47percentage, .width35percentage, .width60percentage {
+    .width40percentage, .width55percentage, .width47percentage, .width35percentage, .width62percentage .width30percentage{
       width: 100%;
     }
   }
