@@ -1,0 +1,30 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.circle {
+    border-radius: 50%;
+    width: 2.2rem;
+    height: 2.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hoverEnabled:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+    transition: transform 0.3s;
+}
+
+.inactive {
+    background-color: var(--complementary-color);
+    color: var(--text-color);
+}
+
+.active {
+    background-color: var(--primary-color);
+    color: white;
+}

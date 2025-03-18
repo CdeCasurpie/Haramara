@@ -9,7 +9,7 @@
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
 }
 
 .price .top p{
@@ -18,10 +18,10 @@
 
 .price .top h1{
     margin-left: 4px;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 500;
 }
 
 .price .bottom{
-    font-size: 0.55rem;
+    font-size: 0.6rem;
 }
