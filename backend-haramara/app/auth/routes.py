@@ -180,7 +180,7 @@ def get_current_user():
         return jsonify({'id': id, 'username': user.username, 'email': user.email, 'url_image':user.url_image, 'type': claims['type']}), 200
     else:
         company = Companies.query.get(id)
-        return jsonify({'id': id, 'name': company.name, 'email': company.email, 'url_image':company.url_image, 'type': claims['type']}), 200
+        return jsonify({'id': id, 'name': company.name, 'email': company.email, 'url_image':company.url_image_logo, 'type': claims['type']}), 200
 
 
 """

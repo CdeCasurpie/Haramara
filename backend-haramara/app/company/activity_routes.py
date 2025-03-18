@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import Activities, Services, Locations, ImagesServices, ShiftActivities, Cupos, db
+from app.models import Activities, Services, ImagesServices, ShiftActivities, Cupos, db
 from app.auth.decorators import login_business_required
 from datetime import datetime, timedelta
+import json
 
 activity_bp = Blueprint('activity_bp', __name__)
 
@@ -42,7 +43,8 @@ def get_activities():
                 "rating": 4.5,  # Valor de ejemplo (podría calcularse de reseñas)
                 "characteristics": activity.features,  # Asumiendo que features almacena características
                 "tags": activity.tags,
-                "images": images_data
+                "images": images_data,
+                "location": json.loads(activity.ubicacion)
             }
             activities_data.append(activity_data)
         
@@ -73,18 +75,6 @@ def get_activity(activity_id):
                 "message": "Actividad no encontrada o no pertenece a esta empresa"
             }), 404
         
-        # Obtener la ubicación de la actividad
-        location = Locations.query.get(activity.id_ubicacion)
-        location_data = None
-        if location:
-            location_data = {
-                "id": location.id,
-                "address": location.address,
-                "country": location.country,
-                "comunity": location.comunity,
-                "province": location.province,
-                "postal_code": location.postal_code
-            }
         
         # Obtener las imágenes del servicio
         images = ImagesServices.query.filter_by(id_service=activity.id_service).all()
@@ -100,7 +90,7 @@ def get_activity(activity_id):
             "initial_vacancies": activity.initial_vacancies,
             "characteristics": activity.features,
             "tags": activity.tags,
-            "location": location_data,
+            "location": json.loads(activity.ubicacion),
             "images": images_data
         }
         
@@ -182,44 +172,26 @@ def create_activity():
                           'initial_vacancies', 'characteristics', 'tags', 'location']
         
         for field in required_fields:
-            if field not in data:
+            if field not in data or data[field] is "" or data[field] is None:
                 return jsonify({
                     "success": False,
                     "message": f"El campo {field} es requerido"
                 }), 400
         
-        # Crear o obtener ubicación
-        location = None
-        if data.get('location'):
-            location_data = data['location']
-            # Si se proporciona ID de ubicación existente
-            if location_data.get('id'):
-                location = Locations.query.get(location_data['id'])
-                if not location:
-                    return jsonify({
-                        "success": False,
-                        "message": "La ubicación especificada no existe"
-                    }), 404
-            else:
-                # Crear nueva ubicación
-                location = Locations(
-                    address=location_data.get('address', ''),
-                    country=location_data.get('country', ''),
-                    comunity=location_data.get('comunity', ''),
-                    province=location_data.get('province', ''),
-                    postal_code=location_data.get('postal_code', '')
-                )
-                location.save()
-        
         # Crear o obtener servicio asociado a la empresa
         service = Services(company_id=company_id)
         service.save()
-        
+
+        # location a string, pasar objeto a string con json.dumps
+        print(data['location'])
+        location = json.dumps(data['location'])
+        print(location)
+
         # Crear la actividad
         activity = Activities(
             id_service=service.id,
             titulo=data['title'],
-            id_ubicacion=location.id if location else None,
+            ubicacion=location,
             price_per_person=float(data['price_per_person']),
             description=data['description'],
             features=data.get('characteristics', {}),
@@ -292,39 +264,12 @@ def update_activity(activity_id):
         if 'tags' in data:
             activity.tags = data['tags']
         
-        # Guardar los cambios en la actividad
-        activity.save()
-        
         # Actualizar la ubicación si se proporciona
         if 'location' in data and data['location']:
-            location_data = data['location']
-            location = Locations.query.get(activity.id_ubicacion)
-            
-            if location:
-                # Actualizar ubicación existente
-                if 'address' in location_data:
-                    location.address = location_data['address']
-                if 'country' in location_data:
-                    location.country = location_data['country']
-                if 'comunity' in location_data:
-                    location.comunity = location_data['comunity']
-                if 'province' in location_data:
-                    location.province = location_data['province']
-                if 'postal_code' in location_data:
-                    location.postal_code = location_data['postal_code']
-                location.save()
-            else:
-                # Crear nueva ubicación
-                new_location = Locations(
-                    address=location_data.get('address', ''),
-                    country=location_data.get('country', ''),
-                    comunity=location_data.get('comunity', ''),
-                    province=location_data.get('province', ''),
-                    postal_code=location_data.get('postal_code', '')
-                )
-                new_location.save()
-                activity.id_ubicacion = new_location.id
-                activity.save()
+            activity.ubicacion = json.dumps(data['location'])
+        
+        # Guardar los cambios en la actividad
+        activity.save()
         
         # Actualizar imágenes si se proporcionan
         if 'images' in data and isinstance(data['images'], list):

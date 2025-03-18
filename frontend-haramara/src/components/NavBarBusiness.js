@@ -6,6 +6,7 @@ import Link from 'next/link';
 import HaramaraButton from './HaramaraButton';
 import styles from './NavBar.module.css';
 import { useUser } from '@/app/UserContext';
+import ProfileCard from './ProfileCard';
 
 const NavBarBusiness = () => {
   const {user, userType, loading, setUser, setLoading, setUserType} = useUser();
@@ -40,20 +41,11 @@ const NavBarBusiness = () => {
                   <HaramaraButton variant="primary">Cerrar Sesión</HaramaraButton>
                 </div>
 
-                <div className={styles.profilePhoto}>
-                  <Image
-                    src="/images/general/profile_default.svg"
-                    alt="Profile photo"
-                    width={50}
-                    height={50}
-                    className={styles.profilePhotoImage}
-                  />
-                </div>
-
-                <div className={styles.profileInfo}>
-                  <span className={styles.profileInfoText}>Hola, Nombre</span>
-                  <p className={styles.profileInfoSubText}>Administrador</p>
-                </div>
+                <ProfileCard 
+                  urlImage={user?.url_image} 
+                  name={user?.name} 
+                  role={user?.email} 
+                />
                 </>
             ) : (
               <div className={styles.authButtons}>
