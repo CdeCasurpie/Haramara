@@ -1,38 +1,29 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './ActivityForm.module.css';
 import LocationField from './LocationField';
 
 const ActivityForm = ({
-  initialData = {
-    title: '',
-    description: '',
-    price_per_person: '',
-    min_age: '15',
-    initial_vacancies: '',
-    location: null,
-    tags: '',
-    characteristics: [],
-    images: []
-  },
-  setInitialData,
-  locations = []
+  activity,
+  setSelectedActivity
 }) => {
-  const [activity, setActivity] = useState(initialData);
-  const [newCharacteristic, setNewCharacteristic] = useState({ name: '', value: '' });
+  const [newCharacteristic, setNewCharacteristic] = React.useState({ name: '', value: '' });
   const fileInputRef = useRef(null);
 
+  // Si la actividad es null, se crea una nueva actividad
   useEffect(() => {
-    if (setInitialData) {
-      setInitialData(activity);
+    if (activity === null) {
+      setSelectedActivity({
+        title: '',
+        description: '',
+      })
     }
-  }, [activity, setInitialData]);
-
+  }, [activity])
   // Manejar cambios en los campos principales
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setActivity({
+    setSelectedActivity({
       ...activity,
       [name]: value
     });
@@ -40,7 +31,7 @@ const ActivityForm = ({
 
   // Manejar la selección de ubicación
   const handleLocationSelect = (location) => {
-    setActivity({
+    setSelectedActivity({
       ...activity,
       location: location
     });
@@ -50,7 +41,7 @@ const ActivityForm = ({
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
-      const newImages = [...activity.images];
+      const newImages = [...(activity.images || [])];
       
       files.forEach(file => {
         // En un entorno real, aquí subirías el archivo a tu servidor o almacenamiento en la nube
@@ -62,7 +53,7 @@ const ActivityForm = ({
             file: file
           });
           
-          setActivity({
+          setSelectedActivity({
             ...activity,
             images: newImages
           });
@@ -77,7 +68,7 @@ const ActivityForm = ({
     const updatedImages = [...activity.images];
     updatedImages.splice(index, 1);
     
-    setActivity({
+    setSelectedActivity({
       ...activity,
       images: updatedImages
     });
@@ -92,10 +83,10 @@ const ActivityForm = ({
   const addCharacteristic = () => {
     if (newCharacteristic.name && newCharacteristic.value) {
       const updatedCharacteristics = [
-        ...activity.characteristics,
+        ...(activity.characteristics || []),
         { ...newCharacteristic }
       ];
-      setActivity({
+      setSelectedActivity({
         ...activity,
         characteristics: updatedCharacteristics
       });
@@ -114,7 +105,7 @@ const ActivityForm = ({
   // Eliminar una característica
   const removeCharacteristic = (index) => {
     const updatedCharacteristics = activity.characteristics.filter((_, i) => i !== index);
-    setActivity({
+    setSelectedActivity({
       ...activity,
       characteristics: updatedCharacteristics
     });
@@ -122,201 +113,205 @@ const ActivityForm = ({
 
   return (
     <div className={styles.formContainer}>
-      {/* Primera fila: Título y Ubicación */}
-      <div className={styles.formRow}>
-        <div className={styles.formGroup + ' ' + styles.width55percentage}>
-          <label className={styles.label}>Nombre de la Actividad:</label>
-          <input
-            type="text"
-            name="title"
-            className={styles.input}
-            value={activity.title}
+      {activity && (
+        <>      
+        {/* Primera fila: Título y Ubicación */}
+        <div className={styles.formRow}>
+          <div className={styles.formGroup + ' ' + styles.width55percentage}>
+            <label className={styles.label}>Nombre de la Actividad:</label>
+            <input
+              type="text"
+              name="title"
+              className={styles.input}
+              value={activity.title || ''}
+              onChange={handleInputChange}
+              placeholder="Título de la actividad"
+            />
+          </div>
+          
+          <div className={styles.formGroup + ' ' + styles.width40percentage}>
+            <label className={styles.label}>Ubicación:</label>
+            <LocationField 
+              initialLocation={activity.location}
+              initialAddress={activity.location?.address || ''}
+              onLocationSelect={handleLocationSelect}
+              placeholder="Seleccionar ubicación"
+            />
+          </div>
+        </div>
+
+        {/* Segunda fila: Descripción */}
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Descripción:</label>
+          <textarea
+            name="description"
+            className={styles.textarea}
+            value={activity.description || ''}
             onChange={handleInputChange}
-            placeholder="Título de la actividad"
+            placeholder="Describe la actividad en detalle..."
+            rows={4}
           />
+        </div>
+
+        {/* Tercera fila: Valores numéricos */}
+        <div className={styles.formRow}>
+          <div className={styles.formGroup + ' ' + styles.width47percentage}>
+            <label className={styles.label}>Precio por persona:</label>
+            <input
+              type="number"
+              name="price_per_person"
+              className={`${styles.input} ${styles.hideSpinners}`}
+              value={activity.price_per_person || ''}
+              onChange={handleInputChange}
+              placeholder="0.00"
+              step="0.01"
+            />
+          </div>
+          
+          <div className={styles.formGroup + ' ' + styles.width47percentage}>
+            <label className={styles.label}>Cupos iniciales:</label>
+            <input
+              type="number"
+              name="initial_vacancies"
+              className={`${styles.input} ${styles.hideSpinners}`}
+              value={activity.initial_vacancies || ''}
+              onChange={handleInputChange}
+              placeholder="15"
+            />
+          </div>
+        </div>
+
+        {/* Cuarta fila: Edad mínima y etiquetas */}
+        <div className={styles.formRow}>
+          <div className={styles.formGroup + ' ' + styles.width35percentage}>
+            <label className={styles.label}>Edad mínima:</label>
+            <input
+              type="number"
+              name="min_age"
+              className={`${styles.input} ${styles.hideSpinners}`}
+              value={activity.min_age || '15'}
+              onChange={handleInputChange}
+              placeholder="15"
+            />
+          </div>
+          
+          <div className={styles.formGroup + ' ' + styles.width60percentage}>
+            <label className={styles.label}>Etiquetas (separadas por comas):</label>
+            <input
+              type="text"
+              name="tags"
+              className={styles.input}
+              value={activity.tags || ''}
+              onChange={handleInputChange}
+              placeholder="playa, familia, deportes, aventura"
+            />
+          </div>
+        </div>
+
+        {/* Quinta fila: Imágenes */}
+        <div className={styles.formGroup}>
+          <div className={styles.imagesHeader}>
+            <label className={styles.label}>Imágenes de la actividad:</label>
+            <button 
+              type="button" 
+              className={styles.addButton}
+              onClick={handleImageButtonClick}
+            >
+              + Añadir imágenes
+            </button>
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              className={styles.hiddenFileInput} 
+              onChange={handleImageUpload}
+              accept="image/*"
+              multiple
+            />
+          </div>
+          
+          <div className={styles.imageGallery}>
+            {activity.images && activity.images.length > 0 ? (
+              activity.images.map((image, index) => (
+                <div key={index} className={styles.imageThumbContainer}>
+                  <img 
+                    src={image.url} 
+                    alt={`Imagen ${index + 1}`} 
+                    className={styles.imageThumb} 
+                  />
+                  <button 
+                    type="button" 
+                    className={styles.removeImageButton}
+                    onClick={() => removeImage(index)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className={styles.uploadImagePlaceholder} onClick={handleImageButtonClick}>
+                Subir imagen
+              </div>
+            )}
+          </div>
         </div>
         
-        <div className={styles.formGroup + ' ' + styles.width40percentage}>
-          <label className={styles.label}>Ubicación:</label>
-          <LocationField 
-            initialLocation={activity.location}
-            initialAddress={activity.location?.address || ''}
-            onLocationSelect={handleLocationSelect}
-            placeholder="Seleccionar ubicación"
-          />
-        </div>
-      </div>
-
-      {/* Segunda fila: Descripción */}
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Descripción:</label>
-        <textarea
-          name="description"
-          className={styles.textarea}
-          value={activity.description}
-          onChange={handleInputChange}
-          placeholder="Describe la actividad en detalle..."
-          rows={4}
-        />
-      </div>
-
-      {/* Tercera fila: Valores numéricos */}
-      <div className={styles.formRow}>
-        <div className={styles.formGroup + ' ' + styles.width47percentage}>
-          <label className={styles.label}>Precio por persona:</label>
-          <input
-            type="number"
-            name="price_per_person"
-            className={`${styles.input} ${styles.hideSpinners}`}
-            value={activity.price_per_person}
-            onChange={handleInputChange}
-            placeholder="0.00"
-            step="0.01"
-          />
-        </div>
-        
-        <div className={styles.formGroup + ' ' + styles.width47percentage}>
-          <label className={styles.label}>Cupos iniciales:</label>
-          <input
-            type="number"
-            name="initial_vacancies"
-            className={`${styles.input} ${styles.hideSpinners}`}
-            value={activity.initial_vacancies}
-            onChange={handleInputChange}
-            placeholder="15"
-          />
-        </div>
-      </div>
-
-      {/* Cuarta fila: Edad mínima y etiquetas */}
-      <div className={styles.formRow}>
-        <div className={styles.formGroup + ' ' + styles.width35percentage}>
-          <label className={styles.label}>Edad mínima:</label>
-          <input
-            type="number"
-            name="min_age"
-            className={`${styles.input} ${styles.hideSpinners}`}
-            value={activity.min_age}
-            onChange={handleInputChange}
-            placeholder="15"
-          />
-        </div>
-        
-        <div className={styles.formGroup + ' ' + styles.width60percentage}>
-          <label className={styles.label}>Etiquetas (separadas por comas):</label>
-          <input
-            type="text"
-            name="tags"
-            className={styles.input}
-            value={activity.tags}
-            onChange={handleInputChange}
-            placeholder="playa, familia, deportes, aventura"
-          />
-        </div>
-      </div>
-
-      {/* Quinta fila: Imágenes */}
-      <div className={styles.formGroup}>
-        <div className={styles.imagesHeader}>
-          <label className={styles.label}>Imágenes de la actividad:</label>
-          <button 
-            type="button" 
-            className={styles.addButton}
-            onClick={handleImageButtonClick}
-          >
-            + Añadir imágenes
-          </button>
-          <input 
-            type="file" 
-            ref={fileInputRef}
-            className={styles.hiddenFileInput} 
-            onChange={handleImageUpload}
-            accept="image/*"
-            multiple
-          />
-        </div>
-        
-        <div className={styles.imageGallery}>
-          {activity.images.length > 0 ? (
-            activity.images.map((image, index) => (
-              <div key={index} className={styles.imageThumbContainer}>
-                <img 
-                  src={image.url} 
-                  alt={`Imagen ${index + 1}`} 
-                  className={styles.imageThumb} 
-                />
+        {/* Sexta fila: Características */}
+        <div className={styles.formGroup}>
+          <div className={styles.characteristicsHeader}>
+            <label className={styles.label}>Características (Nombre | Valor):</label>
+            <button 
+              type="button" 
+              className={styles.addButton}
+              onClick={addCharacteristic}
+            >
+              + Nueva característica
+            </button>
+          </div>
+          
+          <div className={styles.characteristicsList}>
+            {activity.characteristics && activity.characteristics.map((char, index) => (
+              <div key={index} className={styles.characteristicItem}>
+                <div className={styles.charName}>{char.name}</div>
+                <div className={styles.charValue}>{char.value}</div>
                 <button 
                   type="button" 
-                  className={styles.removeImageButton}
-                  onClick={() => removeImage(index)}
+                  className={styles.removeButton}
+                  onClick={() => removeCharacteristic(index)}
                 >
                   ×
                 </button>
               </div>
-            ))
-          ) : (
-            <div className={styles.uploadImagePlaceholder} onClick={handleImageButtonClick}>
-              Subir imagen
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Sexta fila: Características */}
-      <div className={styles.formGroup}>
-        <div className={styles.characteristicsHeader}>
-          <label className={styles.label}>Características (Nombre | Valor):</label>
-          <button 
-            type="button" 
-            className={styles.addButton}
-            onClick={addCharacteristic}
-          >
-            + Nueva característica
-          </button>
-        </div>
-        
-        <div className={styles.characteristicsList}>
-          {activity.characteristics.map((char, index) => (
-            <div key={index} className={styles.characteristicItem}>
-              <div className={styles.charName}>{char.name}</div>
-              <div className={styles.charValue}>{char.value}</div>
+            ))}
+            
+            <div className={styles.characteristicInputs}>
+              <input
+                type="text"
+                className={styles.charNameInput}
+                placeholder="Nombre"
+                value={newCharacteristic.name}
+                onChange={(e) => setNewCharacteristic({...newCharacteristic, name: e.target.value})}
+                onKeyDown={handleKeyDown}
+              />
+              <input
+                type="text"
+                className={styles.charValueInput}
+                placeholder="Valor"
+                value={newCharacteristic.value}
+                onChange={(e) => setNewCharacteristic({...newCharacteristic, value: e.target.value})}
+                onKeyDown={handleKeyDown}
+              />
               <button 
                 type="button" 
                 className={styles.removeButton}
-                onClick={() => removeCharacteristic(index)}
+                onClick={() => setNewCharacteristic({ name: '', value: '' })}
               >
                 ×
               </button>
             </div>
-          ))}
-          
-          <div className={styles.characteristicInputs}>
-            <input
-              type="text"
-              className={styles.charNameInput}
-              placeholder="Nombre"
-              value={newCharacteristic.name}
-              onChange={(e) => setNewCharacteristic({...newCharacteristic, name: e.target.value})}
-              onKeyDown={handleKeyDown}
-            />
-            <input
-              type="text"
-              className={styles.charValueInput}
-              placeholder="Valor"
-              value={newCharacteristic.value}
-              onChange={(e) => setNewCharacteristic({...newCharacteristic, name: newCharacteristic.name, value: e.target.value})}
-              onKeyDown={handleKeyDown}
-            />
-            <button 
-              type="button" 
-              className={styles.removeButton}
-              onClick={() => setNewCharacteristic({ name: '', value: '' })}
-            >
-              ×
-            </button>
           </div>
         </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

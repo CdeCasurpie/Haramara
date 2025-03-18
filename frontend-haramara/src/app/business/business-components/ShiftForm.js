@@ -1,35 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from './ActivityForm.module.css';
 
 const ShiftForm = ({
-  initialData = {
-    day: 'Lunes',
-    startTime: '',
-    endTime: '',
-    startDate: '',
-    endDate: '',
-    availableSlots: '',
-    id_activity: ''
-  },
-  setInitialData,
+  activityShift,
+  setActivityShift,
   onSubmit,
-  activities = []
 }) => {
-  const [shift, setShift] = useState(initialData);
-  
-  useEffect(() => {
-    if (setInitialData) {
-      setInitialData(shift);
-    }
-  }, [shift, setInitialData]);
-
   // Manejar cambios en los campos
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setShift({
-      ...shift,
+    setActivityShift({
+      ...activityShift,
       [name]: value
     });
   };
@@ -37,7 +20,7 @@ const ShiftForm = ({
   // Crear el turno
   const handleCreateShift = () => {
     if (onSubmit) {
-      onSubmit(shift);
+      onSubmit(activityShift);
     }
   };
 
@@ -51,7 +34,7 @@ const ShiftForm = ({
         <select
           name="day"
           className={styles.select}
-          value={shift.day}
+          value={activityShift.day || 'Lunes'}
           onChange={handleInputChange}
         >
           {weekdays.map(day => (
@@ -68,7 +51,7 @@ const ShiftForm = ({
             type="time"
             name="startTime"
             className={styles.input}
-            value={shift.startTime}
+            value={activityShift.startTime || ''}
             onChange={handleInputChange}
             required
           />
@@ -80,7 +63,7 @@ const ShiftForm = ({
             type="time"
             name="endTime"
             className={styles.input}
-            value={shift.endTime}
+            value={activityShift.endTime || ''}
             onChange={handleInputChange}
             required
           />
@@ -95,7 +78,7 @@ const ShiftForm = ({
             type="date"
             name="startDate"
             className={styles.input}
-            value={shift.startDate}
+            value={activityShift.startDate || ''}
             onChange={handleInputChange}
             required
           />
@@ -107,7 +90,7 @@ const ShiftForm = ({
             type="date"
             name="endDate"
             className={styles.input}
-            value={shift.endDate}
+            value={activityShift.endDate || ''}
             onChange={handleInputChange}
             required
           />
@@ -116,26 +99,26 @@ const ShiftForm = ({
 
       {/* Cuarta fila: Cupos disponibles */}
       <div className={styles.formGroup}>
-
-      <label className={styles.label}>Cupos disponibles:</label>
+        <label className={styles.label}>Cupos disponibles:</label>
         <div className={styles.formRow}>
-        <input
-          type="number"
-          name="availableSlots"
-          className={`${styles.input} ${styles.hideSpinners}`}
-          value={shift.availableSlots}
-          onChange={handleInputChange}
-          placeholder="5"
-          min="0"
-          required
-        />
-        <button 
-          type="button" 
-          className={styles.createButton}
-          onClick={handleCreateShift}
-        >
-          Añadir Turno
-        </button></div>
+          <input
+            type="number"
+            name="availableSlots"
+            className={`${styles.input} ${styles.hideSpinners}`}
+            value={activityShift.availableSlots || ''}
+            onChange={handleInputChange}
+            placeholder="5"
+            min="0"
+            required
+          />
+          <button 
+            type="button" 
+            className={styles.createButton}
+            onClick={handleCreateShift}
+          >
+            Añadir Turno
+          </button>
+        </div>
       </div>
       
     </div>

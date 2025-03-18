@@ -132,3 +132,85 @@
 .inputSelect{
     margin-right: 8px;
 }
+
+
+.radioContainer {
+    margin-bottom: 20px;
+}
+
+.radioLabel {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.radioGroup {
+    display: flex;
+    gap: 20px;
+}
+
+.radioOption {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 10px;
+    user-select: none;
+}
+
+.radioOption input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.radioCheckmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    transition: all 0.2s ease-in-out;
+}
+
+.radioOption:hover input ~ .radioCheckmark {
+    border-color: #1180ce;
+}
+
+.radioOption input:checked ~ .radioCheckmark {
+    border-color: #1180ce;
+}
+
+.radioCheckmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.radioOption input:checked ~ .radioCheckmark:after {
+    display: block;
+}
+
+.radioOption .radioCheckmark:after {
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #1180ce;
+    transform: translate(-50%, -50%);
+}
+
+.radioOptionLabel {
+    font-size: 15px;
+    padding-left: 10px;
+    color: #333;
+}

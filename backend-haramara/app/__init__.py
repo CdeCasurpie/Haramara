@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from config import Config
+from config import Config, TestingConfig
 from flask_jwt_extended import JWTManager
 
 from app.auth import auth_bp
@@ -10,9 +10,13 @@ from app.payment import payment_bp
 
 from app.models import *
 
-def create_app():
+def create_app(config_name='development'):
     app = Flask(__name__)
-    app.config.from_object(Config)
+
+    if config_name == 'testing':
+        app.config.from_object(TestingConfig)
+    else:
+        app.config.from_object(Config)
 
 
     # Inicializar la base de datos

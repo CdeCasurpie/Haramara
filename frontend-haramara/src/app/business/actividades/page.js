@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ActivityForm from "../business-components/ActivityForm";
 import BusinessActivity from "../business-components/BusinessActivity";
 import styles from './Actividades.module.css';
@@ -8,46 +8,97 @@ import CustomSlider from '../business-components/CustomSlider';
 import CalendarTab from '../business-components/CalendarTab';
 import HaramaraButton from '@/components/HaramaraButton';
 import { XIcon } from 'lucide-react';
+import { 
+    fetchActivities, 
+    fetchActivityById, 
+    createActivity, 
+    updateActivity, 
+    fetchShiftsByActivityId, 
+    createShifts 
+} from './utils';
 
 export default function Actividades() {
     const [isEditing, setIsEditing] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
-    const [selectedActivity, setSelectedActivity] = useState(null);
     const [activeTab, setActiveTab] = useState('formulario');
-
+    const [isLoading, setIsLoading] = useState(true);
     
-    // Sample activities data
-    const [activities, setActivities] = useState([
-        { id: 1, title: 'Título de la actividad, en Familia', rating: 3 },
-        { id: 2, title: 'Título de la actividad, en Familia', rating: 3 },
-        { id: 3, title: 'Título de la actividad, en Familia', rating: 3 },
-        { id: 4, title: 'Título de la actividad, en Familia', rating: 3 },
-        { id: 5, title: 'Título de la actividad, en Familia', rating: 3 },
-        { id: 6, title: 'Título de la actividad, en Familia', rating: 3 }
-    ]);
+    // Estado para los turnos de la actividad seleccionada
+    const [selectedActivity, setSelectedActivity] = useState(null);
+    const [activityShifts, setActivityShifts] = useState([]);
+    
+    // Estado para la lista de actividades
+    const [activities, setActivities] = useState([]);
+    
+    // Cargar actividades al iniciar
+    useEffect(() => {
+        const loadActivities = async () => {
+            try {
+                setIsLoading(true);
+                const data = await fetchActivities();
+                setActivities(data);
+            } catch (error) {
+                console.error("Error cargando actividades:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        loadActivities();
+    }, []);
 
-    const handleEdit = (activity) => {
+    const handleEdit = async (activity) => {
         setIsCreating(false);
         if (!isEditing) {
             setSelectedActivity(activity);
             setIsEditing(true);
             setActiveTab('formulario');
+            
+            // Cargar los turnos de la actividad seleccionada
+            try {
+                const shifts = await fetchShiftsByActivityId(activity.id);
+                setActivityShifts(shifts);
+            } catch (error) {
+                console.error("Error cargando turnos:", error);
+                setActivityShifts([]);
+            }
         } else {
             if (selectedActivity && selectedActivity.id === activity.id) {
                 setSelectedActivity(null);
                 setIsEditing(false);
+                setActivityShifts([]);
             } else {
                 setSelectedActivity(activity);
                 setActiveTab('formulario');
+                
+                // Cargar turnos para la nueva actividad seleccionada
+                try {
+                    const shifts = await fetchShiftsByActivityId(activity.id);
+                    setActivityShifts(shifts);
+                } catch (error) {
+                    console.error("Error cargando turnos:", error);
+                    setActivityShifts([]);
+                }
             }
         }
     };
 
     const handleCreateActivity = () => {
         setIsEditing(false);
-        setSelectedActivity(null);
+        setSelectedActivity({
+            title: '',
+            description: '',
+            price_per_person: '',
+            min_age: '15',
+            initial_vacancies: '',
+            location: null,
+            tags: '',
+            characteristics: [],
+            images: []
+        });
         setIsCreating(true);
         setActiveTab('formulario');
+        setActivityShifts([]); // Reset de turnos al crear una nueva actividad
     };
 
     const handleTabChange = (tab) => {
@@ -58,6 +109,53 @@ export default function Actividades() {
         setIsEditing(false);
         setIsCreating(false);
         setSelectedActivity(null);
+        setActivityShifts([]);
+    };
+
+    const handleSave = async () => {
+        if (!selectedActivity) return;
+        
+        try {
+            if (isCreating) {
+                // Crear nueva actividad
+                const newActivity = await createActivity(selectedActivity);
+                setActivities([...activities, newActivity]);
+                
+                // Guardar los turnos nuevos (los que no tienen ID)
+                // No es necesario filtrar aquí porque todos son nuevos
+                if (activityShifts.length > 0) {
+                    await createShifts(newActivity.id, activityShifts);
+                }
+                
+                // Resetear estados
+                setIsCreating(false);
+                setSelectedActivity(null);
+                setActivityShifts([]);
+            } else if (isEditing) {
+                // Actualizar actividad existente
+                const updatedActivity = await updateActivity(selectedActivity.id, selectedActivity);
+                
+                // Actualizar la lista de actividades
+                const updatedActivities = activities.map(act => 
+                    act.id === updatedActivity.id ? updatedActivity : act
+                );
+                setActivities(updatedActivities);
+                
+                // Solo crear los turnos nuevos (los que no tienen ID)
+                const newShifts = activityShifts.filter(shift => !shift.id);
+                if (newShifts.length > 0) {
+                    await createShifts(selectedActivity.id, newShifts);
+                }
+                
+                // Resetear estados
+                setIsEditing(false);
+                setSelectedActivity(null);
+                setActivityShifts([]);
+            }
+        } catch (error) {
+            console.error("Error guardando actividad:", error);
+            alert("Error guardando actividad");
+        }
     };
 
     return (
@@ -74,16 +172,32 @@ export default function Actividades() {
                     </button>
                 </div>
 
-                <CustomSlider title='' showBorder={false}>
-                    {activities.map((activity) => (
-                        <BusinessActivity 
-                            key={activity.id} 
-                            activity={activity}
-                            onEdit={() => handleEdit(activity)} 
-                            isEditing={selectedActivity && selectedActivity.id === activity.id}
-                        />
-                    ))}
-                </CustomSlider>
+                {isLoading ? (
+                    <div>Cargando actividades...</div>
+                ) : (
+                    <CustomSlider title='' showBorder={false}>
+                        {activities.map((activity) => (
+                            <BusinessActivity 
+                                key={activity.id} 
+                                activity={activity}
+                                rating={activity.rating}
+                                title={activity.title}
+                                onEdit={() => handleEdit(activity)} 
+                                isEditing={selectedActivity && selectedActivity.id === activity.id}
+                            />
+                        ))}
+                    </CustomSlider>
+                )}
+
+                {/* Debug section - Puedes eliminar esto en producción */}
+                {selectedActivity && (
+                    <pre
+                        style={{
+                            width: '100%',
+                            color: 'black'
+                        }}
+                    >{JSON.stringify(selectedActivity, null, 2)}</pre>
+                )}
             </div>
 
             {/* Right side - Form with Tabs */}
@@ -112,27 +226,22 @@ export default function Actividades() {
                     {activeTab === 'formulario' ? (
                         <div style={{ padding: '30px', height: '80%', overflowY: 'scroll' }}>
                             <ActivityForm 
-                                initialData={selectedActivity ? {
-                                    title: selectedActivity.title,
-                                    description: '',
-                                    price_per_person: '',
-                                    min_age: '15',
-                                    initial_vacancies: '',
-                                    id_ubicacion: '',
-                                    tags: '',
-                                    characteristics: [],
-                                    images: []
-                                } : undefined}
+                                activity={selectedActivity}
+                                setSelectedActivity={setSelectedActivity}
                             />
                         </div>
                     ) : (
                         <div style={{ padding: '30px', height: '80%', overflowY: 'scroll' }}>
-                            <CalendarTab />
+                            <CalendarTab 
+                                activityId={selectedActivity?.id}
+                                activityShifts={activityShifts}
+                                setActivityShifts={setActivityShifts}
+                            />
                         </div>
                     )}
 
                     <div className={styles.footerPanel}>
-                        <HaramaraButton className={styles.buttonSave}>
+                        <HaramaraButton className={styles.buttonSave} onClick={handleSave}>
                             {isCreating ? 'Crear Actividad' : (isEditing ? 'Guardar Cambios' : 'Enviar Datos')}
                         </HaramaraButton>
                     </div>
