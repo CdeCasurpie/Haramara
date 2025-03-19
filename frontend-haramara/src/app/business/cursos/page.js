@@ -47,6 +47,7 @@ export default function Cursos() {
     const [infoCursos, setInfoCursos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [days, setDays] = useState([false, false, false, false, false, false, false]);
+    const [fileImages, setFileImages] = useState([]);
 
     // Actualizar el estado basado en isCreating o isEditing
     useEffect(() => {
@@ -80,8 +81,7 @@ export default function Cursos() {
         try {
             if (isCreating) {
                 // Crear nuevo curso
-                const newCourse = await createCourse(currentCourse);
-                console.log("Curso creado:", newCourse.data);
+                const newCourse = await createCourse(currentCourse, fileImages);
                 setInfoCursos([...infoCursos, newCourse.data]);
                 
                 // Crear turnos si hay
@@ -226,6 +226,7 @@ export default function Cursos() {
                                     location: null,
                                     price: info.price,
                                     level: info.level,
+                                    images: info.images,
                                     business: true,
                                     total_revenue: 1000,
                                     num_reservations: 10,
@@ -280,6 +281,8 @@ export default function Cursos() {
                                 setCourseData={setCurrentCourse}
                                 state={state}
                                 setState={setState}
+                                fileImages={fileImages}
+                                setFileImages={setFileImages}
                             />
                         </div>
                     ) : (

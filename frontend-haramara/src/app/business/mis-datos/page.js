@@ -179,7 +179,10 @@ export default function MisDatos() {
             <div className={styles.coverImageContainer}>
               {formData.url_image_portada && (
                 <img 
-                  src={formData.url_image_portada ? (API_BASE_URL + formData.url_image_portada) : ''}
+                    src={formData.url_image_portada?.startsWith("blob:") 
+                    ? formData.url_image_portada
+                    : API_BASE_URL + formData.url_image_portada || ''}
+                  
                   alt="Portada" 
                   className={styles.coverImage} 
                 />
@@ -203,7 +206,9 @@ export default function MisDatos() {
               <div className={styles.profileInfo}>
                 <div className={styles.profileImageContainer}>
                   <img 
-                    src={formData.url_image_logo ? (API_BASE_URL + formData.url_image_logo) : '/images/general/profile_default.svg'}
+                    src={formData.url_image_logo?.startsWith("blob:") 
+                      ? formData.url_image_logo 
+                      : API_BASE_URL + formData.url_image_logo || '/images/general/profile_default.svg'}
                     alt="Logo" 
                     className={styles.profileImage} 
                   />

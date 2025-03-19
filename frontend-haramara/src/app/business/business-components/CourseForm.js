@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './CourseForm.module.css';
 import LocationField from './LocationField';
+import API_BASE_URL from '@/config';
 
 const CourseForm = ({
   courseData,
   setCourseData,
   onSubmit,
   state,
-  setState
+  setState,
+  fileImages,
+  setFileImages
 }) => {
   const fileInputRef = useRef(null);
 
@@ -36,31 +39,19 @@ const CourseForm = ({
     });
   };
 
-  // Manejar la subida de imágenes
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length > 0) {
-      const newImages = [...(courseData.images || [])];
-      
-      files.forEach(file => {
-        // En un entorno real, aquí subirías el archivo a tu servidor o almacenamiento en la nube
-        // Por ahora, solo creamos URLs temporales para las vistas previas
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          newImages.push({
-            url: reader.result,
-            file: file
-          });
-          
-          setCourseData({
-            ...courseData,
-            images: newImages
-          });
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  };
+
+    // Guardar los archivos directamente como un array en fileImages
+    setFileImages((prev) => [...prev, ...files]);
+
+    // Generar URLs para previsualización sin perder las imágenes del backend
+    setCourseData((prev) => ({
+        ...prev,
+        images: [...(prev.images || []), ...files.map(file => URL.createObjectURL(file))]
+    }));
+};
+
 
   // Eliminar una imagen
   const removeImage = (index) => {
@@ -217,7 +208,7 @@ const CourseForm = ({
             courseData.images.map((image, index) => (
               <div key={index} className={styles.imageThumbContainer}>
                 <img 
-                  src={image.url} 
+                  src={image?.startsWith("blob:") ? image : `${API_BASE_URL}/${image}` || ''}
                   alt={`Imagen ${index + 1}`} 
                   className={styles.imageThumb} 
                 />

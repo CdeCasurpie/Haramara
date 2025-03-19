@@ -5,6 +5,8 @@ from app.auth.decorators import login_business_required
 from app.utils import *
 import json
 from datetime import datetime
+import os
+from werkzeug.utils import secure_filename
 
 cursos_bp = Blueprint('cursos_bp', __name__)
 
@@ -31,6 +33,11 @@ def get_courses():
         for course in courses:
             # Preparamos los datos del curso
 
+            # Obtenemos las imagenes del curso
+            service_id = course.id_service
+
+            images = ImagesServices.query.filter_by(id_service=service_id).all()
+
             course_data = {
                 "id": course.id,
                 "titulo": course.titulo,
@@ -43,7 +50,7 @@ def get_courses():
                 "vacancies": course.vacancies,
                 "min_age": course.min_age,
                 "location": json.loads(course.ubicacion),
-                "images": [],                
+                "images": [image.url_image for image in images]          
             }
 
             courses_data.append(course_data)
@@ -66,15 +73,29 @@ def create_course():
     """
     Crea un curso
     """
+    print("hello babys")
     company_id = get_jwt_identity()
-    data = request.get_json()
+    print(company_id)
+    data = request.form.to_dict()
+    print("====================================")
+    print(data)
+    print("====================================")
 
     try:
-        required_fields = ["titulo", "price", "start_date", "end_date", "adittional_info", "description", "tags", "vacancies", "ubicacion"]
-        data, missing = get_post_data(request, required_fields)
+        print(1)
+        required_fields = ["titulo", "price", "start_date", "end_date", "adittional_info", "description", "tags", "vacancies", "ubicacion", "min_age"]
+        print(2)
+        missing = []
+        if required_fields:
+            for field in required_fields:
+                if field not in data or data[field] in [None, "", [], {}]:
+                    missing.append(field)
+        print(2.5)
+        print(data)
+        print(missing)
         if missing:
             return jsonify({"success": False, "message": f"Campos requeridos: {', '.join(missing)}"}), 400
-        
+        print(3)
         # verificiaciones de valores numericos
         try:
             data["price"] = float(data["price"])
@@ -104,7 +125,6 @@ def create_course():
             data['end_date'] = datetime.strptime(data['end_date'], '%Y-%m-%d')
         except Exception as e:
             return jsonify({"success": False, "message": "Las fechas deben tener el formato 'YYYY-MM-DD'"}), 400
-        
 
 
         with db.session.begin():
@@ -113,10 +133,29 @@ def create_course():
             db.session.add(service)
             db.session.flush()
 
-            #location
-            ubicacion = json.dumps(data['ubicacion'])
+            # manejamos las imagenes
 
-            print("=====", data)
+            # configurción de directorio de imagenes de un servicio
+            upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads', 'services', str(service.id))
+            os.makedirs(upload_folder, exist_ok=True)
+
+            images = request.files.getlist('images')
+
+            print(images)
+
+            image_paths = []
+
+            for image in images:
+                if image.filename != '':
+                    # Guardar el archivo con un nombre seguro
+                    image_filename = secure_filename(image.filename)
+                    image_path = os.path.join(upload_folder, f"image_{image_filename}")
+                    image.save(image_path)
+
+                    # Obtener la URL relativa para almacenar en la base de datos
+                    image_url = f"/static/uploads/services/{service.id}/image_{image_filename}"
+                    image_paths.append(image_url)   
+
 
             # Creamos el curso
             course = Courses(
@@ -128,23 +167,17 @@ def create_course():
                 description=data['description'],
                 tags=data['tags'],
                 vacancies=data['vacancies'],
-                ubicacion=ubicacion,
+                ubicacion=data['ubicacion'],
                 id_service=service.id,
                 min_age=data['min_age']
             )
             db.session.add(course)
             db.session.flush()
 
-            #procesar imagenes si existen
-            if 'images' in data and isinstance(data['images'], list):
-                for image_data in data['images']:
-                    if isinstance(image_data, dict) and 'url' in image_data:
-                        image = ImagesServices(
-                            url_image=image_data['url'],
-                            id_service=service.id
-                        )
-                        db.session.add(image)
-                        db.session.flush()
+            # Guardamos las imagenes en la base de datos
+            for image_path in image_paths:
+                image = ImagesServices(id_service=service.id, url_image=image_path)
+                db.session.add(image)
 
             return jsonify({"success": True, 
                             "message": "Curso creado exitosamente", 
@@ -160,7 +193,7 @@ def create_course():
                                         "vacancies": course.vacancies,
                                         "ubicacion": json.loads(course.ubicacion),
                                         "min_age": course.min_age,
-                                        "images": [],  
+                                        "images": image_paths
                                         }}), 201
 
     except Exception as e:
