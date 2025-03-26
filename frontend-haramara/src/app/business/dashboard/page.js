@@ -55,7 +55,7 @@ function generateTitleRandom() {
 
 export default function BusinessDashboard() {
   return (
-    <>
+    <div style={{ width: "100%", height: "100%", paddingLeft: "40px" }}>
       <div
         style={{
           display: "flex",
@@ -113,10 +113,18 @@ export default function BusinessDashboard() {
                 return (
                     <div key={index} style={{ height: "100%", width: "100%" }}>
                         <BusinessActivity
-                        title={title}
                         onEdit={() => {}}
-                        rating={3}
-                        image={"https://picsum.photos/seed/" + title + "/200/300"}
+                        activity={
+                          {
+                            title: title,
+                            rating: 3,
+                            images: [
+                              {
+                                url: "https://picsum.photos/seed/" + title + "/200/300",
+                              }
+                            ],
+                          }
+                        }
                         />
                     </div>
                     );
@@ -140,10 +148,18 @@ export default function BusinessDashboard() {
                 return (
                     <div key={index} style={{ height: "100%", width: "100%" }}>
                         <BusinessActivity
-                        title={title}
                         onEdit={() => {}}
-                        rating={3}
-                        image={"https://picsum.photos/seed/" + title + "/200/300"}
+                        activity={
+                          {
+                            title: title,
+                            rating: 3,
+                            images: [
+                              {
+                                url: "https://picsum.photos/seed/" + title + "/200/300",
+                              }
+                            ],
+                          }
+                        }
                         />
                     </div>
                     );
@@ -151,6 +167,6 @@ export default function BusinessDashboard() {
           </CustomSlider>
         </div>
       </div>
-    </>
+    </div>
   );
 }

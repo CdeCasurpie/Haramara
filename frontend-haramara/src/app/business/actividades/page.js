@@ -172,14 +172,11 @@ export default function Actividades() {
                 {isLoading ? (
                     <div>Cargando actividades...</div>
                 ) : (
-                    <CustomSlider title='' showBorder={false}>
+                    <CustomSlider title='' showBorder={false} itemHeight={140}>
                         {activities.map((activity) => (
                             <BusinessActivity 
                                 key={activity.id} 
-                                image={activity.images[0]?.url || "/images/general/placeholder_image.png"}
                                 activity={activity}
-                                rating={activity.rating}
-                                title={activity.title}
                                 onEdit={() => handleEdit(activity)} 
                                 isEditing={selectedActivity && selectedActivity.id === activity.id}
                             />

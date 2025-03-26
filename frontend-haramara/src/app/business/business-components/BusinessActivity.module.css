@@ -10,13 +10,18 @@
     border: 1px solid var(--border-color);
 }
 
+.headerRow {
+    display: flex;
+    flex-direction: column;
+}
+
 .card:hover {
     transform: translateY(-2px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .imageContainer {
-    width: 150px;
+    width: 200px;
     min-width: 150px;
     overflow: hidden;
 }
@@ -29,14 +34,14 @@
 
 .contentContainer {
     flex: 1;
-    padding: 20px 24px;
+    padding: 18px 18px;
     display: flex;
     flex-direction: column;
     position: relative;
 }
 
 .title {
-    margin: 0 0 12px 0;
+    margin-right: 12px;
     font-size: 1.3rem;
     font-weight: 500;
     color: var(--primary-color);
@@ -63,6 +68,10 @@
 .starEmpty {
     color: #f39c12;
     opacity: 1;
+}
+
+.starEmpty, .starHalf, .starFull {
+    margin-bottom: 5px;
 }
 
 .editButton {
@@ -111,7 +120,6 @@
     
     .title {
     font-size: 22px;
-    margin-bottom: 10px;
     }
     
     .ratingContainer {
@@ -123,4 +131,32 @@
     margin-top: 16px;
     align-self: flex-end;
     }
+}
+
+.detailsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.infoGrid {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 0;
+    gap: 12px;
+}
+
+.infoLabel {
+    font-size: 14px;
+    color: var(--secondary-color);
+}
+
+.infoValue {
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.description {
+    font-size: 14px;
+    color: var(--text-color);
 }

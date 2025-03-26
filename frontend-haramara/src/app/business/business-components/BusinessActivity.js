@@ -1,12 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { act } from 'react';
 import styles from './BusinessActivity.module.css';
 
 const BusinessActivity = ({
-  image = "/images/general/placeholder_image.png",
-  title = "Insertar titulo de actividad",
-  rating = 0,
+  activity,
   onEdit,
   isEditing = false
 }) => {
@@ -46,23 +44,42 @@ const BusinessActivity = ({
   return (
     <div className={styles.card}>
       <div className={styles.imageContainer}>
-        <img 
-          src={image} 
-          alt={title} 
+        <img
+          src={activity.images ? activity.images[0].url : "/images/general/placeholder_image.png"} 
+          alt={activity.title}
           className={styles.image} 
         />
       </div>
       
       <div className={styles.contentContainer}>
-        <h3 className={styles.title}>{title}</h3>
+        <div className={styles.headerRow}>
+          <h3 className={styles.title}>{activity.title}</h3>
+          <div className={styles.ratingContainer}>
+            {renderStars(activity.rating ? activity.rating : 0)}
+          </div>
+        </div>
         
-        <div className={styles.ratingContainer}>
-          {renderStars(rating)}
+        <div className={styles.detailsContainer}>
+          <div className={styles.infoGrid}>
+            {activity.min_age > 0 && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Desde los </span>
+                <span className={styles.infoValue}>{activity.min_age} años</span>
+              </div>
+            )}
+            
+            {activity.location && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Ubicación:</span>
+                <span className={styles.infoValue}>{activity.location.address ? activity.location.address : "Sin ubicación"}</span>
+              </div>
+            )}
+          </div>
         </div>
         
         <button 
           className={isEditing ? styles.editingButton : styles.editButton}
-          onClick={() => onEdit()}
+          onClick={() => onEdit(activity)}
         >
           {isEditing ? 'Editando' : 'Editar'}
         </button>
