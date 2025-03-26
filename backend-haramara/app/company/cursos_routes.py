@@ -5,6 +5,9 @@ from app.auth.decorators import login_business_required
 from app.utils import *
 import json
 from datetime import datetime
+import os
+from werkzeug.utils import secure_filename
+from app.company.utils import verifications
 
 cursos_bp = Blueprint('cursos_bp', __name__)
 
@@ -31,6 +34,11 @@ def get_courses():
         for course in courses:
             # Preparamos los datos del curso
 
+            # Obtenemos las imagenes del curso
+            service_id = course.id_service
+
+            images = ImagesServices.query.filter_by(id_service=service_id).all()
+
             course_data = {
                 "id": course.id,
                 "titulo": course.titulo,
@@ -43,7 +51,7 @@ def get_courses():
                 "vacancies": course.vacancies,
                 "min_age": course.min_age,
                 "location": json.loads(course.ubicacion),
-                "images": [],                
+                "images": [image.url_image for image in images]          
             }
 
             courses_data.append(course_data)
@@ -67,56 +75,40 @@ def create_course():
     Crea un curso
     """
     company_id = get_jwt_identity()
-    data = request.get_json()
+    data = request.form.to_dict()
 
     try:
-        required_fields = ["titulo", "price", "start_date", "end_date", "adittional_info", "description", "tags", "vacancies", "ubicacion"]
-        data, missing = get_post_data(request, required_fields)
-        if missing:
-            return jsonify({"success": False, "message": f"Campos requeridos: {', '.join(missing)}"}), 400
+        result = verifications(data)
+        if result:
+            return result
         
-        # verificiaciones de valores numericos
-        try:
-            data["price"] = float(data["price"])
-            if data["price"] < 0:
-                return jsonify({"success": False, "message": "El precio debe ser un número positivo"}), 400
-        except ValueError:
-            return jsonify({"success": False, "message": "El precio debe ser un número válido"}), 400
-
-        try:
-            data["vacancies"] = int(data["vacancies"])
-            if data["vacancies"] < 0:
-                return jsonify({"success": False, "message": "Las vacantes deben ser un número positivo"}), 400
-        except ValueError:
-            return jsonify({"success": False, "message": "Las vacantes deben ser un número válido"}), 400
-
-        try:
-            data["min_age"] = int(data["min_age"])
-            if data["min_age"] < 0:
-                return jsonify({"success": False, "message": "La edad mínima debe ser un número positivo"}), 400
-        except ValueError:
-            return jsonify({"success": False, "message": "La edad mínima debe ser un número válido"}), 400
-
-
-        # verificamos que las fechas sean válidas
-        try:
-            data['start_date'] = datetime.strptime(data['start_date'], '%Y-%m-%d')
-            data['end_date'] = datetime.strptime(data['end_date'], '%Y-%m-%d')
-        except Exception as e:
-            return jsonify({"success": False, "message": "Las fechas deben tener el formato 'YYYY-MM-DD'"}), 400
-        
-
-
         with db.session.begin():
             #creamos el servicio
             service = Services(company_id = company_id)
             db.session.add(service)
             db.session.flush()
 
-            #location
-            ubicacion = json.dumps(data['ubicacion'])
+            # manejamos las imagenes
 
-            print("=====", data)
+            # configurción de directorio de imagenes de un servicio
+            upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads', 'services', str(service.id))
+            os.makedirs(upload_folder, exist_ok=True)
+
+            images = request.files.getlist('images')
+
+            image_paths = []
+
+            for image in images:
+                if image.filename != '':
+                    # Guardar el archivo con un nombre seguro
+                    image_filename = secure_filename(image.filename)
+                    image_path = os.path.join(upload_folder, f"image_{image_filename}")
+                    image.save(image_path)
+
+                    # Obtener la URL relativa para almacenar en la base de datos
+                    image_url = f"/static/uploads/services/{service.id}/image_{image_filename}"
+                    image_paths.append(image_url)   
+
 
             # Creamos el curso
             course = Courses(
@@ -128,23 +120,17 @@ def create_course():
                 description=data['description'],
                 tags=data['tags'],
                 vacancies=data['vacancies'],
-                ubicacion=ubicacion,
+                ubicacion=data['ubicacion'],
                 id_service=service.id,
                 min_age=data['min_age']
             )
             db.session.add(course)
             db.session.flush()
 
-            #procesar imagenes si existen
-            if 'images' in data and isinstance(data['images'], list):
-                for image_data in data['images']:
-                    if isinstance(image_data, dict) and 'url' in image_data:
-                        image = ImagesServices(
-                            url_image=image_data['url'],
-                            id_service=service.id
-                        )
-                        db.session.add(image)
-                        db.session.flush()
+            # Guardamos las imagenes en la base de datos
+            for image_path in image_paths:
+                image = ImagesServices(id_service=service.id, url_image=image_path)
+                db.session.add(image)
 
             return jsonify({"success": True, 
                             "message": "Curso creado exitosamente", 
@@ -160,7 +146,7 @@ def create_course():
                                         "vacancies": course.vacancies,
                                         "ubicacion": json.loads(course.ubicacion),
                                         "min_age": course.min_age,
-                                        "images": [],  
+                                        "images": image_paths
                                         }}), 201
 
     except Exception as e:
@@ -170,8 +156,118 @@ def create_course():
 
 
 @cursos_bp.route('/company/courses/<int:id>', methods=['PUT'])
+@login_business_required
 def update_course(id):
     """
     Actualiza un curso
     """
-    return jsonify({'message': 'not implemented yet'}), 501
+
+    company_id = get_jwt_identity()
+    data = request.form.to_dict()
+
+    try:
+        print(1)
+        result = verifications(data)
+        if result:
+            return result
+        print(2)
+        with db.session.begin():
+            course = Courses.query.get(id)
+            if not course:
+                return jsonify({"success": False, "message": "Curso no encontrado"}), 404
+
+            # Verificamos que el curso pertenezca a la empresa
+            service = Services.query.get(course.id_service)
+            print(service.company_id, company_id)
+            if str(service.company_id) != str(company_id):
+                return jsonify({"success": False, "message": "No tienes permisos para modificar este curso"}), 403
+            
+            print(3)
+            # editamos el curso
+            print(">>>", course.ubicacion)
+            print("========")
+            print(data)
+            print("========")
+            course.titulo = data['titulo']
+            course.price = data['price']
+            course.start_date = data['start_date']
+            course.end_date = data['end_date']
+            course.adittional_info = data['adittional_info']
+            course.description = data['description']
+            course.tags = data['tags']
+            course.vacancies = data['vacancies']
+            course.ubicacion = data['ubicacion']
+            course.min_age = data['min_age']
+
+            # manejamos las imagenes
+            print(">>>", course.ubicacion)
+            images = request.files.getlist('images') # obtenemos las imagenes enviadas a agregar
+
+            # configurción de directorio de imagenes de un servicio
+            upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads', 'services', str(service.id))
+            os.makedirs(upload_folder, exist_ok=True)
+
+            image_paths = []
+
+            for image in images:
+                if image.filename != '':
+                    # Guardar el archivo con un nombre seguro
+                    image_filename = secure_filename(image.filename)
+                    image_path = os.path.join(upload_folder, f"image_{image_filename}")
+                    image.save(image_path)
+
+                    # Obtener la URL relativa para almacenar en la base de datos
+                    image_url = f"/static/uploads/services/{service.id}/image_{image_filename}"
+                    image_paths.append(image_url)
+
+                    # Guardamos las imagenes en la base de datos
+                    new_image = ImagesServices(id_service=service.id, url_image=image_url)
+                    db.session.add(new_image)
+
+            # Eliminamos las iamgenes que se quitaron
+            images_to_remove = data["images_deleted"]
+            print("===**==============**=====", images_to_remove)
+
+            for image_url in images_to_remove:
+                image = ImagesServices.query.filter_by(url_image=image_url).first()
+
+                # Eliminamos el archivo
+                """
+                image_path = os.path.join(os.getcwd(), 'app', 'static', 'uploads', 'services', str(service.id), image_url.split('/')[-1])
+                os.remove(image_path)   
+                """
+                if image:
+                    db.session.delete(image) 
+
+            #imagnees actuales
+            current_images = ImagesServices.query.filter_by(id_service=service.id).all()
+            l = []
+            for image in current_images:
+                if image.url_image not in images_to_remove:
+                    l.append(image.url_image)   
+
+            
+            return jsonify({"success": True,
+                            "message": "Curso actualizado exitosamente",
+                            "data": {"id": course.id,
+                                     "id_service": service.id,
+                                    "titulo": course.titulo,
+                                    "price": course.price,
+                                    "start_date": course.start_date.strftime('%Y-%m-%d'),
+                                    "end_date": course.end_date.strftime('%Y-%m-%d'),
+                                    "adittional_info": course.adittional_info,
+                                    "description": course.description,
+                                    "tags": course.tags,
+                                    "vacancies": course.vacancies,
+                                    "location": json.loads(course.ubicacion), #el front espera location en lugar de ubicación
+                                    "min_age": course.min_age,
+                                    "images": l
+                                    }}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False,
+                        "message": f"Error al actualizar curso: {str(e)}"}), 500
+        
+
+

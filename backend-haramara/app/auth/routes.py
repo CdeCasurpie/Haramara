@@ -176,13 +176,15 @@ def get_current_user():
     claims = get_jwt()
     user_type = claims['type']
 
-    if user_type == 'user':
-        user = Users.query.get(id)
-        return jsonify({'id': id, 'username': user.username, 'email': user.email, 'url_image':user.url_image, 'type': claims['type']}), 200
-    else:
-        company = Companies.query.get(id)
-        return jsonify({'id': id, 'name': company.name, 'email': company.email, 'url_image':company.url_image_logo, 'type': claims['type']}), 200
-
+    try:
+        if user_type == 'user':
+            user = Users.query.get(id)
+            return jsonify({'id': id, 'username': user.username, 'email': user.email, 'url_image':user.url_image, 'type': claims['type']}), 200
+        else:
+            company = Companies.query.get(id)
+            return jsonify({'id': id, 'name': company.name, 'email': company.email, 'url_image':company.url_image_logo, 'type': claims['type']}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'no user logged in'}), 401
 
 """
 Ruta para confirmar el registro de una empresa

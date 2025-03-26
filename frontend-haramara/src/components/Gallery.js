@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import Image from "next/image";
 import styles from "./Gallery.module.css";
+import API_BASE_URL from "@/config";
 
 const Gallery = ({ images, autoPlay = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -22,6 +23,7 @@ const Gallery = ({ images, autoPlay = false }) => {
 
   useEffect(() => {
     if (!autoPlay) return;
+    
 
     const interval = setInterval(() => {
       // Inicia la transición de fade out
@@ -37,6 +39,11 @@ const Gallery = ({ images, autoPlay = false }) => {
   }
   , [currentIndex, autoPlay]);
 
+  useEffect(() => {
+  console.log(API_BASE_URL + images[0]);
+  }
+  , []);
+
   return (
     <div className={styles.galleryContainer}>
       <div
@@ -47,10 +54,18 @@ const Gallery = ({ images, autoPlay = false }) => {
         }}
       >
         <Image
-          src={images && images[currentIndex] ? images[currentIndex] : "/images/general/placeholder_image.png"}
+          src={
+            images && images[currentIndex]
+              ? images[currentIndex].startsWith("blob:")
+                ? images[currentIndex] 
+                : API_BASE_URL + images[currentIndex]
+              : "/images/general/placeholder_image.png"
+          }
+        
           alt="Imagen de la galería"
           fill
           style={{ objectFit: "cover" }}
+          unoptimized
         />
       </div>
       {!autoPlay && ( 

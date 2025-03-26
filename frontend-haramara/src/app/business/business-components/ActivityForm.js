@@ -39,6 +39,7 @@ const ActivityForm = ({
 
   // Manejar la subida de imágenes
   const handleImageUpload = (e) => {
+    console.log("handleImageUpload");
     const files = Array.from(e.target.files);
     if (files.length > 0) {
       const newImages = [...(activity.images || [])];
@@ -61,6 +62,8 @@ const ActivityForm = ({
         reader.readAsDataURL(file);
       });
     }
+
+    console.log(activity);
   };
 
   // Eliminar una imagen

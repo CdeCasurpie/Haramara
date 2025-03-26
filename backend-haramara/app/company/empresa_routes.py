@@ -155,6 +155,7 @@ def update_company_profile():
         
     except Exception as e:
         db.session.rollback()
+        print(e)
         return jsonify({
             "success": False,
             "message": f"Error al actualizar perfil: {str(e)}"

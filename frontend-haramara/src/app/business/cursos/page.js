@@ -9,7 +9,7 @@ import stylesCursos from './Cursos.module.css';
 import { useEffect, useState } from 'react';
 import HaramaraButton from '@/components/HaramaraButton';
 import { XIcon } from 'lucide-react';
-import { fetchCourses, createCourse } from './utils';
+import { fetchCourses, createCourse, updateCourse } from './utils';
 import CustomSlider from '../business-components/CustomSlider';
 
 export default function Cursos() {
@@ -47,6 +47,8 @@ export default function Cursos() {
     const [infoCursos, setInfoCursos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [days, setDays] = useState([false, false, false, false, false, false, false]);
+    const [fileImages, setFileImages] = useState([]);
+    const [imagesDeleted, setImagesDeleted] = useState([]);
 
     // Actualizar el estado basado en isCreating o isEditing
     useEffect(() => {
@@ -80,8 +82,7 @@ export default function Cursos() {
         try {
             if (isCreating) {
                 // Crear nuevo curso
-                const newCourse = await createCourse(currentCourse);
-                console.log("Curso creado:", newCourse.data);
+                const newCourse = await createCourse(currentCourse, fileImages);
                 setInfoCursos([...infoCursos, newCourse.data]);
                 
                 // Crear turnos si hay
@@ -90,9 +91,20 @@ export default function Cursos() {
                     console.log("Turnos a crear", newTurnos);
                 }
             } else if (isEditing) {
-                // Aquí iría la lógica para actualizar el curso
-                console.log("Editando curso", currentCourse);
-                
+                console.log("jummm:", currentCourse);
+                console.log(">->", fileImages);
+                console.log("-><-", imagesDeleted);
+                const updatedCourse = await updateCourse(currentCourse, fileImages, imagesDeleted);
+                if (!updatedCourse || !updatedCourse.data) throw new Error("Error al actualizar curso");
+                console.log("EUREKA!!!", updatedCourse.data);
+                setInfoCursos(infoCursos.map(course =>
+                    course.id === updatedCourse.data.id ? updatedCourse.data : course
+                ));
+    
+                if (newTurnos.length > 0) {
+                    console.log("Turnos a actualizar", newTurnos);
+                }
+
                 // Y actualizar turnos si hay
                 if (newTurnos.length > 0) {
                     console.log("Turnos a actualizar", newTurnos);
@@ -161,12 +173,12 @@ export default function Cursos() {
     const handleCreateCourse = () => {
         setIsEditing(false);
         setCurrentCourse({
-            title: '',
+            titulo: '',
             description: '',
             price: '',
-            startDate: '',
-            endDate: '',
-            minAge: '15',
+            start_date: '',
+            end_date: '',
+            min_age: '15',
             vacancies: '',
             location: null,
             tags: '',
@@ -182,6 +194,7 @@ export default function Cursos() {
         setCurrentCourse(course);
         setIsEditing(true);
         setActiveTab('formulario');
+        console.log("Editando curso:", currentCourse);
         
         // Aquí podríamos cargar los turnos del curso
         // En un caso real, haríamos una petición al backend
@@ -226,6 +239,7 @@ export default function Cursos() {
                                     location: null,
                                     price: info.price,
                                     level: info.level,
+                                    images: info.images,
                                     business: true,
                                     total_revenue: 1000,
                                     num_reservations: 10,
@@ -280,6 +294,10 @@ export default function Cursos() {
                                 setCourseData={setCurrentCourse}
                                 state={state}
                                 setState={setState}
+                                fileImages={fileImages}
+                                setFileImages={setFileImages}
+                                imagesDeleted={imagesDeleted}
+                                setImagesDeleted={setImagesDeleted}
                             />
                         </div>
                     ) : (
