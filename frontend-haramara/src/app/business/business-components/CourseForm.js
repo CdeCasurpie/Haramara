@@ -12,9 +12,12 @@ const CourseForm = ({
   state,
   setState,
   fileImages,
-  setFileImages
+  setFileImages,
+  imagesDeleted,
+  setImagesDeleted
 }) => {
   const fileInputRef = useRef(null);
+  const [countOldImages, setCountOldImages] = useState( courseData?.images?.length || 0);
 
   useEffect(() => {
     if (state === "normal") {
@@ -55,14 +58,42 @@ const CourseForm = ({
 
   // Eliminar una imagen
   const removeImage = (index) => {
-    const updatedImages = [...courseData.images];
-    updatedImages.splice(index, 1);
-    
-    setCourseData({
-      ...courseData,
-      images: updatedImages
+    console.log("old images: ", countOldImages);
+    setImagesDeleted((prev) => {
+      if (index < countOldImages) {
+        return [...prev, courseData.images[index]];
+      }
+      return prev;
     });
+  
+    console.log(">>>", index, countOldImages);
+    if (index < countOldImages) {
+      console.log("bubu")
+      setCountOldImages((prev) => prev - 1);
+    } else {
+      console.log("fileImages: ", fileImages);
+      console.log("index: ", index);
+      console.log("countOldImages: ", countOldImages);
+      setFileImages((prev) => {
+        const newImages = [...prev];
+        console.log("newImages before: ", newImages);
+        newImages.splice(index - countOldImages, 1);
+        console.log("newImages after: ", newImages);
+        return newImages;
+      });
+      console.log("fileImages after: ", fileImages);
+    }
+  
+    // Actualizar `courseData.images`
+    setCourseData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  
+    console.log("Images deleted: ", imagesDeleted);
+    console.log("Images a añadir: ", fileImages);
   };
+  
 
   // Botón para abrir el selector de archivos
   const handleImageButtonClick = () => {
