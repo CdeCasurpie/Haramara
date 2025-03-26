@@ -31,13 +31,16 @@ const NavBar = () => {
 
           {/* Navigation Links */}
           <div className={styles.navLinks}>
+            <Link href="/client" className={styles.link}>
+              Inicio
+            </Link>
             <Link href="/client/activities" className={styles.link}>
               Actividades
             </Link>
-            <Link href="/cursos" className={styles.link}>
+            <Link href="/client/courses" className={styles.link}>
               Cursos
             </Link>
-            <Link href="/productos" className={styles.link}>
+            <Link href="/client/products" className={styles.link}>
               Productos
             </Link>
             <Link href="/business" className={styles.link + ' ' + styles.seller}>

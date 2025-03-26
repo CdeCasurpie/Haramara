@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styles from "./Gallery.module.css";
 import API_BASE_URL from "@/config";
@@ -7,6 +7,7 @@ import API_BASE_URL from "@/config";
 const Gallery = ({ images, autoPlay = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fade, setFade] = useState(true);
+  const [imageErrors, setImageErrors] = useState({});
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -20,10 +21,8 @@ const Gallery = ({ images, autoPlay = false }) => {
     );
   };
 
-
   useEffect(() => {
     if (!autoPlay) return;
-    
 
     const interval = setInterval(() => {
       // Inicia la transición de fade out
@@ -33,16 +32,40 @@ const Gallery = ({ images, autoPlay = false }) => {
         goToNext();
         setFade(true);
       }, 500); //  duración del fade
-    }, 2500); 
+    }, 2500);
 
     return () => clearInterval(interval);
-  }
-  , [currentIndex, autoPlay]);
+  }, [currentIndex, autoPlay]);
 
-  useEffect(() => {
-  console.log(API_BASE_URL + images[0]);
-  }
-  , []);
+  // Function to determine the image source with fallbacks
+  const getImageSrc = (index) => {
+    if (!images || !images[index]) {
+      return "/images/general/placeholder_image.png";
+    }
+
+    const image = images[index];
+
+    // If there's an error for this image, try local path
+    if (imageErrors[index]) {
+      // Try to load from local public directory
+      return image.startsWith("/") ? image : `/${image}`;
+    }
+
+    // Use blob URL directly
+    if (image.startsWith("blob:")) {
+      return image;
+    }
+
+    // Use API_BASE_URL if it's a relative path from backend
+    return API_BASE_URL + image;
+  };
+
+  const handleImageError = (index) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [index]: true
+    }));
+  };
 
   return (
     <div className={styles.galleryContainer}>
@@ -54,21 +77,15 @@ const Gallery = ({ images, autoPlay = false }) => {
         }}
       >
         <Image
-          src={
-            images && images[currentIndex]
-              ? images[currentIndex].startsWith("blob:")
-                ? images[currentIndex] 
-                : API_BASE_URL + images[currentIndex]
-              : "/images/general/placeholder_image.png"
-          }
-        
+          src={getImageSrc(currentIndex)}
           alt="Imagen de la galería"
           fill
           style={{ objectFit: "cover" }}
           unoptimized
+          onError={() => handleImageError(currentIndex)}
         />
       </div>
-      {!autoPlay && ( 
+      {!autoPlay && (
         <>
           <button className={styles.arrowButton} onClick={goToPrevious}>
             &#x276E; {/* Símbolo < */}

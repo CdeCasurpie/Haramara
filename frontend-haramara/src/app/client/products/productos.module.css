@@ -1,0 +1,436 @@
+.container {
+    width: 100%;
+    min-height: 100vh;
+    background-color: white;
+}
+
+/* Barra de búsqueda */
+.searchContainer {
+    background-color: #f5f5f5;
+    padding: 20px;
+    width: 100%;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.searchBar {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.searchBar > * {
+    flex: 1;
+}
+
+.selectWrapper {
+    max-width: 250px;
+}
+
+.searchButton {
+    max-width: 150px;
+}
+
+/* Contenido principal */
+.mainContent {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.sectionTitle {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.cartIcon {
+    position: relative;
+    cursor: pointer;
+}
+
+.cartCount {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 12px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contentColumns {
+    display: flex;
+    gap: 20px;
+}
+
+/* Columna de filtros */
+.filtersColumn {
+    width: 250px;
+    flex-shrink: 0;
+}
+
+.filterSection {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+.filterTitle {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    color: var(--text-color);
+}
+
+.filterGroup {
+    margin-bottom: 18px;
+}
+
+.filterGroupTitle {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0 0 12px 0;
+    color: var(--text-color);
+}
+
+.checkboxGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Estilo mejorado de checkbox */
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    cursor: pointer;
+    position: relative;
+    padding-left: 28px;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.checkboxLabel:hover {
+    color: var(--primary-color);
+}
+
+.checkbox {
+    position: absolute;
+    opacity: 0;
+    height: 0;
+    width: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: #fff;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.checkboxLabel:hover .checkmark {
+    border-color: var(--primary-color);
+}
+
+.checkbox:checked ~ .checkmark {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkboxLabel .checkmark:after {
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Estilo mejorado para el switch toggle */
+.toggleContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggleLabel {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.toggleSwitch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.toggleSwitch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggleSlider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e0e0e0;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.toggleSlider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggleSwitch input:checked + .toggleSlider {
+    background-color: var(--primary-color);
+}
+
+.toggleSwitch input:checked + .toggleSlider:before {
+    transform: translateX(22px);
+}
+
+/* Filtro de rango de precios */
+.rangeContainer {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.rangeLabels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.rangeLabel {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.rangeLabel.selected {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.rangeSlider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    background: #f0f0f0;
+    border-radius: 5px;
+    margin: 10px 0;
+    outline: none;
+    padding: 0;
+}
+
+.rangeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.rangeSlider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+
+.rangeInputs {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.rangeInput {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+    background: #ffffff00;
+    margin-top: 15px;
+    color: var(--text-color);
+}
+
+.rangeInput:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.priceRangeTicks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.priceTick {
+    font-size: 0.7rem;
+    color: #666;
+    position: relative;
+}
+
+.priceTick::before {
+    content: '|';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #d1d5db;
+}
+
+.filterButton {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filterButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Columna de productos */
+.productsColumn {
+    flex: 1;
+}
+
+.productsGrid {
+    padding: 20px;
+    padding-top: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+    gap: 36px;
+}
+
+.productItem {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.loading {
+    padding: 20px;
+    text-align: center;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    color: #666;
+}
+
+.noResults {
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1200px) {
+    .productsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .contentColumns {
+    flex-direction: column;
+    }
+    
+    .filtersColumn {
+    width: 100%;
+    }
+    
+    .filterSection {
+    position: sticky;
+    top: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .searchBar {
+    flex-direction: column;
+    gap: 15px;
+    }
+    
+    .searchBar > * {
+    width: 100%;
+    }
+    
+    .selectWrapper {
+    max-width: none;
+    }
+    
+    .searchButton {
+    max-width: none;
+    }
+    
+    .productsGrid {
+    grid-template-columns: 1fr;
+    }
+}

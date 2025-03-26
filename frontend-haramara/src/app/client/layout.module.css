@@ -1,0 +1,31 @@
+.fixedNavBar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    
+    animation: showNavBar 0.3s ease;
+}
+
+@keyframes hideNavBar {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes showNavBar {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+}
