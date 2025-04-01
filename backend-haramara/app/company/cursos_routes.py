@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import Activities, Services, Locations, ImagesServices, ShiftActivities, Cupos, db, Courses
+from app.models import db, Courses, Services, ImagesServices, ShiftCourses
 from app.auth.decorators import login_business_required
 from app.utils import *
 import json
@@ -132,6 +132,24 @@ def create_course():
                 image = ImagesServices(id_service=service.id, url_image=image_path)
                 db.session.add(image)
 
+            # creamos los turnos
+            if data.get("turnos"):
+                print("turnos", data["turnos"])
+
+                turnos_list = json.loads(data["turnos"])
+                for shift in turnos_list:
+                    print("shift", shift)
+                    # Convertimos los días a una cadena de 7 caracteres
+                    frequency = ''.join(['1' if day else '0' for day in shift['frequency']])
+                    new_shift = ShiftCourses(
+                        id_course=course.id,
+                        start_time=shift['start_time'],
+                        end_time=shift['end_time'],
+                        frequency=frequency,
+                        free_vacancies=course.vacancies
+                    )
+                    db.session.add(new_shift)
+
             return jsonify({"success": True, 
                             "message": "Curso creado exitosamente", 
                             "data": {"id": course.id, 
@@ -166,11 +184,11 @@ def update_course(id):
     data = request.form.to_dict()
 
     try:
-        print(1)
+
         result = verifications(data)
         if result:
             return result
-        print(2)
+
         with db.session.begin():
             course = Courses.query.get(id)
             if not course:
@@ -182,12 +200,6 @@ def update_course(id):
             if str(service.company_id) != str(company_id):
                 return jsonify({"success": False, "message": "No tienes permisos para modificar este curso"}), 403
             
-            print(3)
-            # editamos el curso
-            print(">>>", course.ubicacion)
-            print("========")
-            print(data)
-            print("========")
             course.titulo = data['titulo']
             course.price = data['price']
             course.start_date = data['start_date']
@@ -199,8 +211,25 @@ def update_course(id):
             course.ubicacion = data['ubicacion']
             course.min_age = data['min_age']
 
+            # creamos los turnos
+            if data.get("turnos"):
+                print("turnos", data["turnos"])
+
+                turnos_list = json.loads(data["turnos"])
+                for shift in turnos_list:
+                    print("shift", shift)
+                    # Convertimos los días a una cadena de 7 caracteres
+                    frequency = ''.join(['1' if day else '0' for day in shift['frequency']])
+                    new_shift = ShiftCourses(
+                        id_course=course.id,
+                        start_time=shift['start_time'],
+                        end_time=shift['end_time'],
+                        frequency=frequency,
+                        free_vacancies=course.vacancies
+                    )
+                    db.session.add(new_shift)
+
             # manejamos las imagenes
-            print(">>>", course.ubicacion)
             images = request.files.getlist('images') # obtenemos las imagenes enviadas a agregar
 
             # configurción de directorio de imagenes de un servicio
@@ -227,7 +256,8 @@ def update_course(id):
             # Eliminamos las iamgenes que se quitaron
             images_to_remove = data["images_deleted"]
             print("===**==============**=====", images_to_remove)
-
+            images_to_remove = list(images_to_remove.split(','))
+            print("===**==============**=====", images_to_remove)
             for image_url in images_to_remove:
                 image = ImagesServices.query.filter_by(url_image=image_url).first()
 
@@ -238,6 +268,9 @@ def update_course(id):
                 """
                 if image:
                     db.session.delete(image) 
+                    print("se debio haber eliminado")
+                else:
+                    print("no se elimino")
 
             #imagnees actuales
             current_images = ImagesServices.query.filter_by(id_service=service.id).all()
@@ -268,6 +301,47 @@ def update_course(id):
         db.session.rollback()
         return jsonify({"success": False,
                         "message": f"Error al actualizar curso: {str(e)}"}), 500
+
+
+### turnos 
+
+@cursos_bp.route('/company/courses/<int:id>/shifts', methods=['GET'])
+def get_shifts(id):
+    """
+    Retorna todos los turnos de un curso
+    """
+    try:
+        # Primero buscamos el curso
+        course = Courses.query.get(id)
+        if not course:
+            return jsonify({"success": False, "message": "Curso no encontrado"}), 404
+
+        # Buscamos los turnos del curso
+        shifts = ShiftCourses.query.filter_by(id_course=id).all()
+        
+        # Preparamos los datos para la respuesta
+        shifts_data = []
+        for shift in shifts:
+            # Convertimos los días a una lista de bools
+            days = [bool(int(day)) for day in shift.frequency]
+            print(days)
+            shift_data = {
+                "id": shift.id,
+                "courseId": shift.id_course,
+                "startTime": shift.start_time.strftime('%H:%M:%S'),
+                "endTime": shift.end_time.strftime('%H:%M:%S'),
+                "initialDays": days,
+                "numReservations": course.vacancies - shift.free_vacancies,
+                "freeVacancies": shift.free_vacancies,
+            }
+            shifts_data.append(shift_data)
+        
+        return jsonify({"success": True, "turnos": shifts_data}), 200
+    
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "message": f"Error al obtener turnos: {str(e)}"}), 500
+
         
 
 

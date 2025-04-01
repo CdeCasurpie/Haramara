@@ -18,6 +18,7 @@ import ProductCard from '@/components/ProductCard';
 import { Calendar } from 'lucide-react';
 
 import React, { useState } from "react";
+import ActivityTurno from '@/components/ActivityTurno';
 
 export default function Formulario() {
   const [occupiedDays, setOcupiedDays] = useState(["2025-02-24", "2025-02-26"]);
@@ -76,7 +77,7 @@ export default function Formulario() {
   ];
 
   return (
-    <>
+    <div style={{width: '100%', padding: '20px', background: '#f0f4f8'}}>
       <h1 style={{ textAlign: 'center', margin: '30px 0', fontSize: '2rem', color: 'var(--primary-color)' }}>
         Componentes de prueba
       </h1>
@@ -97,6 +98,14 @@ export default function Formulario() {
             inventory={sampleProducts[0].inventory}
           />
         </div>
+      </div>
+
+      <div style={{ margin: '40px 0', padding: '20px', width: "600px"}}>
+          <ActivityTurno turno={{
+            startTime: "10:00",
+            endTime: "12:00",
+            freeVacancies: 4,
+          }} />
       </div>
 
       <ActivityBanner info={{ 
@@ -131,6 +140,6 @@ export default function Formulario() {
         location: "Cusquito",
         price: 100,
       }} />
-    </>
+    </div>
   );
 }

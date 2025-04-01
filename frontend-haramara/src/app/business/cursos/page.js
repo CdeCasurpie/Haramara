@@ -9,7 +9,7 @@ import stylesCursos from './Cursos.module.css';
 import { useEffect, useState } from 'react';
 import HaramaraButton from '@/components/HaramaraButton';
 import { XIcon } from 'lucide-react';
-import { fetchCourses, createCourse, updateCourse } from './utils';
+import { fetchCourses, createCourse, updateCourse, fetchTurnos } from './utils';
 import CustomSlider from '../business-components/CustomSlider';
 
 export default function Cursos() {
@@ -43,6 +43,7 @@ export default function Cursos() {
         endTime: '',
         days: [false, false, false, false, false, false, false],
     });
+    const [isLoadingTurnos, setIsLoadingTurnos] = useState(true);
     const [newTurnos, setNewTurnos] = useState([]);
     const [infoCursos, setInfoCursos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -64,6 +65,7 @@ export default function Cursos() {
     // Cargar cursos al iniciar
     useEffect(() => {
         const fetchInfoCursos = async () => {
+            setLoading(true);
             try {
                 const data = await fetchCourses();
                 setInfoCursos(data);
@@ -82,21 +84,25 @@ export default function Cursos() {
         try {
             if (isCreating) {
                 // Crear nuevo curso
-                const newCourse = await createCourse(currentCourse, fileImages);
+                const newCourse = await createCourse(currentCourse, fileImages, newTurnos);
                 setInfoCursos([...infoCursos, newCourse.data]);
-                
-                // Crear turnos si hay
-                if (newTurnos.length > 0) {
-                    // Aquí iría la lógica para crear turnos
-                    console.log("Turnos a crear", newTurnos);
-                }
+
+                setFileImages([]);
+                setImagesDeleted([]);
+
+
             } else if (isEditing) {
                 console.log("jummm:", currentCourse);
                 console.log(">->", fileImages);
                 console.log("-><-", imagesDeleted);
-                const updatedCourse = await updateCourse(currentCourse, fileImages, imagesDeleted);
+                const updatedCourse = await updateCourse(currentCourse, fileImages, imagesDeleted, newTurnos);
                 if (!updatedCourse || !updatedCourse.data) throw new Error("Error al actualizar curso");
                 console.log("EUREKA!!!", updatedCourse.data);
+
+                // limpiar imágenes eliminadas
+                setImagesDeleted([]);
+                setFileImages([]);
+
                 setInfoCursos(infoCursos.map(course =>
                     course.id === updatedCourse.data.id ? updatedCourse.data : course
                 ));
@@ -129,6 +135,7 @@ export default function Cursos() {
         setActiveTab(tab);
     };
 
+    //forms de turnos
     const handleInputChange = (e) => {
         setTurnosFormData({
             ...TurnosFormData,
@@ -143,7 +150,6 @@ export default function Cursos() {
         // Añadir a la lista de turnos visibles
         const newTurno = {
             id: turnos.length + 1,
-            courseId: currentCourse?.id || 1,
             startTime: TurnosFormData.startTime,
             endTime: TurnosFormData.endTime,
             initialDays: days,
@@ -155,12 +161,12 @@ export default function Cursos() {
         
         // Añadir a la lista de turnos para enviar al backend
         setNewTurnos([...newTurnos, {
-            id_course: currentCourse?.id,
             start_time: TurnosFormData.startTime,
             end_time: TurnosFormData.endTime,
             frequency: days,
         }]);
-        
+
+
         // Reiniciar el formulario
         setTurnosFormData({
             startTime: '',
@@ -195,17 +201,33 @@ export default function Cursos() {
         setIsEditing(true);
         setActiveTab('formulario');
         console.log("Editando curso:", currentCourse);
-        
-        // Aquí podríamos cargar los turnos del curso
-        // En un caso real, haríamos una petición al backend
-        // setTurnos([...turnos_del_curso]);
+    
+        setNewTurnos([]); // Reset de turnos al editar un curso
+
+        const fetchInfoCursos = async () => {
+            setIsLoadingTurnos(true);
+            try {
+                const data = await fetchTurnos(course.id);
+                setTurnos(data);
+                setIsLoadingTurnos(false);
+            } catch (error) {
+                console.error("Error en fetchInfoCursos:", error);
+                setIsLoadingTurnos(false);
+            }
+        }
+        fetchInfoCursos();
     };
     
     const handleCloseForm = () => {
         setIsEditing(false);
         setIsCreating(false);
         setCurrentCourse(null);
+        setActiveTab('formulario');
+        setState("normal");
+        setFileImages([]);
+        setImagesDeleted([]);
         setTurnos([]);
+        setNewTurnos([]);
     };
 
     return (
@@ -335,9 +357,11 @@ export default function Cursos() {
                                 </div>
                             </div>
                             <div className={stylesCursos.turnosContainer}>
-                                {turnos.map((turno) => (
+                                {
+                                turnos.map((turno) => (
                                     <TurnoCurso key={turno.id} turno={turno} />
-                                ))}
+                                ))
+                                }
                             </div>
                         </form>
                     )}

@@ -1,0 +1,61 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+    width: 100%;
+    color: var(--text-color);
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-weight: 550;
+}
+
+.left div {
+    font-size: 14px;
+    font-weight: normal;
+    margin-bottom: 4px;
+}
+
+.right {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.formGroup {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 1.5rem;
+}
+
+.input {
+    width: 50px;
+    padding: 4px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.soldOut {
+    color: red;
+    font-weight: bold;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.available {
+    font-weight: 500 !important;
+}

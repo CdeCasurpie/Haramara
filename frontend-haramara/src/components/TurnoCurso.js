@@ -18,8 +18,6 @@ export default function TurnoCurso({turno}) {
     }
     */
     const [days, setDays] = useState(turno.initialDays);
-    const [editing, setEditing] = useState(false);
-
     const handleConfirmTurno = () => {
         console.log("Confirmar turno", days);
     };
@@ -34,29 +32,13 @@ export default function TurnoCurso({turno}) {
                 {turno.startTime} - {turno.endTime}
             </div>
             <div className={styles.details}>
-                <Days days={days} setDays={setDays} editing={editing} />
-                <div className={styles.editContainer} onClick={() => setEditing(!editing)}>
-                    {
-                        editing ? 
-                        (
-                            <CheckCircle size={15} color="green" onClick={handleConfirmTurno} />
-                        ) : (
-                            <Image
-                                src="/images/general/edit.svg"
-                                alt="Editar"
-                                width={15}
-                                height={15}
-                            />
-                        )
-                    }
-                </div>
+                <Days days={days} setDays={setDays}/>
                 <div className={styles.right}>
                     {turno.numReservations} reservas realizadas
                     <div className={styles.students} onClick={turno.handleStudents}>
                         ver alumnos
                     </div>
-                </div>   
-                <DeleteIcon size={20} color="red" onClick={() => handleDeleteTurno(turno.id)} />
+                </div>
             </div>
         </div>
     );
