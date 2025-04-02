@@ -45,7 +45,7 @@ const BusinessActivity = ({
     <div className={styles.card}>
       <div className={styles.imageContainer}>
         <img
-          src={activity.images ? activity.images[0].url : "/images/general/placeholder_image.png"} 
+          src={"/images/general/placeholder_image.png"} 
           alt={activity.title}
           className={styles.image} 
         />
