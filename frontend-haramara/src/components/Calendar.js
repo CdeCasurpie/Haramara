@@ -40,6 +40,7 @@ export default function CalendarSlider({ occupiedDays = [], selectedDay, setSele
       const nextFree = findNextFreeDay(occupiedDays, today, zonaHoraria);
       setSelectedDay(nextFree);
     }
+    console.log("Selected day ca:", selectedDay);
   }, [occupiedDays, today, selectedDay, setSelectedDay]);
 
   return (

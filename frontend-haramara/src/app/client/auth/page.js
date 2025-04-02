@@ -19,6 +19,7 @@ import { Calendar } from 'lucide-react';
 
 import React, { useState } from "react";
 import ActivityTurno from '@/components/ActivityTurno';
+import Feature from '@/components/Feature';
 
 export default function Formulario() {
   const [occupiedDays, setOcupiedDays] = useState(["2025-02-24", "2025-02-26"]);
@@ -106,6 +107,8 @@ export default function Formulario() {
             endTime: "12:00",
             freeVacancies: 4,
           }} />
+
+          <Feature name="Duración" content="2 horas" />
       </div>
 
       <ActivityBanner info={{ 
