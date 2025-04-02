@@ -438,7 +438,7 @@ export default function ClientProductsPage() {
                       ratings={product.ratings}
                       reviewCount={product.reviewCount}
                       inventory={product.inventory}
-                      href={`/productos/${product.id}`}
+                      href={`/client/products/${product.id}`}
                     />
                   </div>
                 ))}

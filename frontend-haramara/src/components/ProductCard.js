@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import HaramaraButton from './HaramaraButton';
@@ -9,21 +9,12 @@ const ProductCard = ({
   imageUrl, 
   title, 
   price, 
-  discountPrice, 
+  discountPrice,
   ratings = 4.5, 
   reviewCount = 124,
   inventory = 10,
   href = "#"
 }) => {
-  const [inCart, setInCart] = useState(false);
-  
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setInCart(!inCart);
-    // Aquí iría la lógica para añadir al carrito
-  };
-
   // Calcular el porcentaje de descuento si hay precio con descuento
   const discountPercentage = discountPrice 
     ? Math.round(((price - discountPrice) / price) * 100) 
@@ -103,13 +94,12 @@ const ProductCard = ({
             )}
           </div>
           
-          <div className={styles.actions}>
+          <div className={styles.buttonContainer}>
             <HaramaraButton 
-              variant={inCart ? "success" : "principal"}
-              onClick={handleAddToCart}
+              variant={"principal"}
               className={styles.addButton}
             >
-              {inCart ? 'Añadido ✓' : 'Añadir al carrito'}
+              Ver más detalles
             </HaramaraButton>
           </div>
         </div>

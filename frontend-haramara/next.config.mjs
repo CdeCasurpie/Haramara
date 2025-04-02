@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-      domains: ["localhost"], // Agrega aquí el dominio de tu backend
+      domains: ["localhost", "picsum.photos"], // Agrega aquí el dominio de tu backend
       remotePatterns: [
         {
           protocol: 'http',
