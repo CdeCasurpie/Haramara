@@ -1,5 +1,5 @@
 .pageContainer {
-  padding: 40px 20px;
+  padding-top: 2rem;
   background-color: white;
 }
 
@@ -100,7 +100,7 @@
   .relatedCoursesGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .relatedCoursesSection {
     padding: 1.5rem;
   }

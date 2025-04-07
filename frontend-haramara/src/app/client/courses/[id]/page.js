@@ -50,14 +50,6 @@ export default function CourseDetailPage() {
     }
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className={styles.pageContainer}>
-        <div className={styles.loading}>Cargando información del curso...</div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className={styles.pageContainer}>

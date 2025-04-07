@@ -312,7 +312,7 @@ export const fetchCourseDetail = async (id) => {
           course: dynamicCourse
         });
       }
-    }, 300); // Simular un pequeño retraso de red
+    }, 1000); // Simular un pequeño retraso de red
   });
 };
 
@@ -338,7 +338,7 @@ export const fetchCourseReviews = async (courseId) => {
         success: true,
         reviews: reviews
       });
-    }, 200);
+    }, 500);
   });
 };
 
@@ -371,7 +371,7 @@ export const fetchRelatedCourses = async (courseId) => {
         success: true,
         courses: relatedCourses
       });
-    }, 250);
+    }, 300);
   });
 };
 

@@ -8,10 +8,98 @@ import SimpleMap from '@/components/SimpleMap';
 import Gallery from '@/components/Gallery';
 
 export default function SingleCourseView({ courseData }) {
+  // Estado de carga
   if (!courseData) {
-    return <div className={styles.loading}>Cargando información del curso...</div>;
+    return (
+      <div className={styles.container}>
+        <div className={styles.contentContainer}>
+          {/* Skeleton de imagen móvil */}
+          <div className={styles.mobileImageContainer}>
+            <div className={styles.skeletonImage}></div>
+          </div>
+
+          {/* Columna izquierda - Skeleton */}
+          <div className={styles.leftColumn}>
+            {/* Skeleton de galería */}
+            <div className={styles.galleryContainer}>
+              <div className={styles.skeletonGallery}></div>
+            </div>
+
+            {/* Skeleton de turnos */}
+            <div className={styles.turnosSection}>
+              <div className={styles.skeletonTitle}></div>
+              
+              <div className={styles.turnosList}>
+                {[1, 2, 3].map((_, index) => (
+                  <div key={index} className={styles.skeletonCard}>
+                    <div className={styles.skeletonLine}></div>
+                    <div className={styles.skeletonDays}>
+                      {[...Array(7)].map((_, i) => (
+                        <div key={i} className={styles.skeletonCircle}></div>
+                      ))}
+                    </div>
+                    <div className={styles.skeletonText}></div>
+                    <div className={styles.skeletonButtonWrapper}>
+                      <div className={styles.skeletonButton}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Columna derecha - Skeleton */}
+          <div className={styles.rightColumn}>
+            {/* Cabecera skeleton */}
+            <div className={styles.courseHeader}>
+              <div className={styles.courseHeaderLeft}>
+                <div className={styles.skeletonTitleLarge}></div>
+                <div className={styles.skeletonLine}></div>
+                <div className={styles.skeletonLine} style={{ width: '70%' }}></div>
+                <div className={styles.skeletonLine} style={{ width: '50%' }}></div>
+              </div>
+              
+              <div className={styles.courseHeaderRight}>
+                <div className={styles.skeletonLocation}></div>
+                <div className={styles.skeletonPrice}></div>
+              </div>
+            </div>
+
+            {/* Contenido skeleton */}
+            <div className={styles.courseContent}>
+              <div className={styles.skeletonTitle}></div>
+              <div className={styles.skeletonParagraph}></div>
+              <div className={styles.skeletonParagraph}></div>
+              
+              <div className={styles.skeletonTitle} style={{ marginTop: '30px' }}></div>
+              <div className={styles.skeletonList}>
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className={styles.skeletonListItem}></div>
+                ))}
+              </div>
+              
+              <div className={styles.skeletonTitle} style={{ marginTop: '30px' }}></div>
+              <div className={styles.skeletonList}>
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className={styles.skeletonListItem}></div>
+                ))}
+              </div>
+              
+              <div className={styles.skeletonTitle} style={{ marginTop: '30px' }}></div>
+              
+              {/* Mapa skeleton */}
+              <div className={styles.locationSection}>
+                <div className={styles.skeletonTitle}></div>
+                <div className={styles.skeletonMap}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
   
+  // Contenido real
   return (
     <div className={styles.container}>
       <div className={styles.contentContainer}>
