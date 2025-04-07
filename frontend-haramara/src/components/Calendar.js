@@ -10,10 +10,8 @@ const monthNames = [
 
 const dayNames = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"];
 
-export default function CalendarSlider({ occupiedDays = [], selectedDay, setSelectedDay, zonaHoraria }) {
+export default function CalendarSlider({ occupiedDays = [], selectedDay, setSelectedDay, zonaHoraria, currentYear, setCurrentYear, currentMonth, setCurrentMonth }) {
   const today = new Date();
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
 
   const handleNextMonth = () => {
     setCurrentMonth((prev) => (prev + 1) % 12);

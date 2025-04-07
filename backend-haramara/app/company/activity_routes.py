@@ -3,10 +3,20 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import Activities, Services, ImagesServices, ShiftActivities, Cupos, db
 from app.auth.decorators import login_business_required
 from app.utils import save_base64_image
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
 import os
 from werkzeug.utils import secure_filename
+
+DAYS_MAP = {
+    0: 'Mo',
+    1: 'Tu',
+    2: 'We',
+    3: 'Th',
+    4: 'Fr',
+    5: 'Sa',
+    6: 'Su'
+}
 
 activity_bp = Blueprint('activity_bp', __name__)
 
@@ -557,5 +567,173 @@ def delete_activity(activity_id):
 
 
 # Rutas para el cliente
+@activity_bp.route('/activities', methods=['GET'])
+def get_all_activities():
+    """
+    Obtiene todas las actividades disponibles para los clientes con paginación.
+    Query parameters:
+        - page: número de página (por defecto 1)
+        - page_size: tamaño de página (por defecto 10)
+    """
+    try:
+        # Obtener parámetros de paginación
+        page = request.args.get('page', default=1, type=int)
+        page_size = request.args.get('page_size', default=10, type=int)
+        
+        if page < 1 or page_size < 1:
+            return jsonify({"success": False, "message": "Parámetros de paginación inválidos"}), 400
+
+        # Calcular el desplazamiento
+        offset = (page - 1) * page_size
+
+        # Obtener actividades con límite y desplazamiento
+        activities = Activities.query.offset(offset).limit(page_size).all()
+        
+        # Obtener el total de actividades para saber cuántas páginas hay
+        total_activities = Activities.query.count()
+
+        # Preparar los datos para la respuesta
+        activities_data = []
+        for activity in activities:
+            # Obtener imágenes asociadas al servicio
+            images = ImagesServices.query.filter_by(id_service=activity.id_service).all()
+            images_data = [{"id": img.id, "url": img.url_image} for img in images]
+            
+            # Preparar los datos básicos de la actividad
+            activity_data = {
+                "id": activity.id,
+                "title": activity.titulo,
+                "price_per_person": float(activity.price_per_person),
+                "rating": 4.5,  # Valor de ejemplo (podría calcularse de reseñas)
+                "num_reservations": 10,  # Valor de ejemplo (podría calcularse de reservas)
+                "images": images_data,
+                "location": json.loads(activity.ubicacion)
+            }
+            activities_data.append(activity_data)
+        
+        return jsonify({
+            "success": True,
+            "activities": activities_data,
+            "pagination": {
+                "page": page,
+                "page_size": page_size,
+                "total_items": total_activities,
+                "total_pages": (total_activities + page_size - 1) // page_size  # redondeo hacia arriba
+            }
+        }), 200
+    
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Error al obtener actividades: {str(e)}"}), 500
+    
+
+@activity_bp.route('/activities/<int:activity_id>', methods=['GET'])
+def get_activity_details(activity_id):
+    """
+    Obtiene los detalles completos de una actividad específica para el cliente
+    """
+    try:
+        # Obtener la actividad por ID
+        activity = Activities.query.get(activity_id)
+        
+        if not activity:
+            return jsonify({
+                "success": False,
+                "message": "Actividad no encontrada"
+            }), 404
+        
+        # Obtener imágenes asociadas al servicio
+        images = ImagesServices.query.filter_by(id_service=activity.id_service).all()
+        images_data = [{"id": img.id, "url": img.url_image} for img in images]
+
+        # Preparar la respuesta detallada
+        activity_data = {
+            "id": activity.id,
+            "title": activity.titulo,
+            "description": activity.description,
+            "price_per_person": float(activity.price_per_person),
+            "min_age": activity.min_age,
+            "initial_vacancies": activity.initial_vacancies,
+            "characteristics": activity.features,
+            "tags": activity.tags,
+            "location": json.loads(activity.ubicacion),
+            "images": images_data,
+            "rating": 4.5,  # Valor de ejemplo (podría calcularse de reseñas)
+        }
+        
+        return jsonify({
+            "success": True,
+            "activity": activity_data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error al obtener los detalles de la actividad: {str(e)}"
+        }), 500
 
 
+@activity_bp.route('/activities/<int:activity_id>/shifts', methods=['GET'])
+def get_activity_shifts_for_year(activity_id):
+    """
+    Obtiene todos los turnos disponibles para una actividad específica en el año dado (o el año actual por defecto)
+    """
+    try:
+        # Obtener la actividad
+        activity = Activities.query.get(activity_id)
+        if not activity:
+            return jsonify({"success": False, "message": "Actividad no encontrada"}), 404
+        
+        # Obtener parámetros para el año
+        year = request.args.get('year', default=date.today().year, type=int)
+
+        # Fecha inicial y final del año
+        start_of_year = date(year, 1, 1)
+        end_of_year = date(year, 12, 31)
+
+        # Diccionario para agrupar fechas con turnos
+        dict_fechas_turnos = {}
+
+        current_date = start_of_year
+
+        while current_date <= end_of_year:
+            dia_semana = DAYS_MAP[current_date.weekday()]
+
+            # Buscar turnos activos para ese día
+            shifts = ShiftActivities.query.filter(
+                ShiftActivities.id_activity == activity_id,
+                ShiftActivities.start_date <= current_date,
+                ShiftActivities.end_date >= current_date,
+                ShiftActivities.date == dia_semana
+            ).all()
+
+            for shift in shifts:
+                # Ver si hay un cupo materializado para esa fecha
+                cupo = Cupos.query.filter_by(id_ShiftActivity=shift.id, fecha=current_date).first()
+
+                # Preparar la información del turno
+                shift_info = {
+                    "id": str(shift.id),
+                    "startTime": shift.start_time.strftime("%H:%M"),
+                    "endTime": shift.end_time.strftime("%H:%M"),
+                    "freeVacancies": cupo.free_vacancies if cupo else activity.initial_vacancies,
+                }
+
+                # Si ya existe la fecha en el diccionario, agregamos el turno a la lista
+                if current_date.isoformat() in dict_fechas_turnos:
+                    dict_fechas_turnos[current_date.isoformat()].append(shift_info)
+                else:
+                    dict_fechas_turnos[current_date.isoformat()] = [shift_info]
+            # Pasar al día siguiente
+            current_date += timedelta(days=1)
+
+        # Lista para ver los dias ocupados
+        occupied_days = []
+
+        for fecha, turnos in dict_fechas_turnos.items():
+            if all(turno["freeVacancies"] == 0 for turno in turnos):
+                occupied_days.append(fecha)     
+        
+
+        return jsonify({"success": True, "shifts": dict_fechas_turnos, "occupied_days": occupied_days}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Error al obtener turnos: {str(e)}"}), 500

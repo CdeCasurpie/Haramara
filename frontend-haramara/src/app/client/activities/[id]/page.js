@@ -8,42 +8,78 @@ import CalendarSlider from "@/components/Calendar";
 import ActivityTurno from "@/components/ActivityTurno";
 import Footer from "@/components/Footer";
 import SimpleMap from "@/components/SimpleMap";
+import { fetchActivityDetails, fetchTurnosPerYear } from "./utils";
+import { h } from "vue";
 
 export default function ActivityDetail() {
   const params = useParams();
   const { id } = params; // Obtiene el parámetro dinámico
   const [selectedDay, setSelectedDay] = useState(null);
   const [turnos, setTurnos] = useState([]);
-// id | id_service |  titulo   | ubicacion | price_per_person |  description   | features | min_age | initial_vacancies | tags
-const data = {
-    id: id,
-    imagesList: [
-      "/images/home/adultos.jpg",
-      "/images/home/buceo.jpg",
-      "/images/home/family.jpg",
-      "/images/home/kids.jpg",
-    ],
-    //ubicacion es un json con lat, lng, address y full_address
-    location: {
-        lat: 40.4168,
-        lng: -3.7038,
-        address: "Gran Vía 28",
-        full_address: "Gran Vía 28, Madrid, España"
-    },    
-    title: "Clase de Yoga",
-    minAge: 18,
-    price: 50,
-    stars: 4.5,
-    description: "Clase de yoga para todos los niveles. Mejora tu flexibilidad y bienestar. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    features: {
-        "Duración": "2 horas",
-        "Equipamiento": "Colchoneta de yoga, bloques",
-        "Servicios": "Instructor certificado, agua",
-        "Nivel": "Principiante a avanzado",
-        "Clima": "Soleado",
-    },
-    occupiedDays: ["2025-04-02", "2025-04-26"],
-  }
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [data, setData] = useState(null);
+  const [hashOccupiedDays, setHashOccupiedDays] = useState({});
+  const [HashTurnosPerYear, setHashTurnosPerYear] = useState({});
+  const [loadingCalendar, setLoadingCalendar] = useState(true);
+  const [loadingTurnos, setLoadingTurnos] = useState(true);
+  const [loadingData, setLoadingData] = useState(true);
+
+
+  // Traemos la data y los turnos del año al cargar la pagina
+  useEffect(() => {
+    const fetchInfoData = async () => {
+        setLoadingData(true);
+        try {
+            // Simulando la carga de datos
+            console.log("Fetching data for activity ID:", id);
+            const data = await fetchActivityDetails(id); 
+            console.log("Data:", data);
+            if (data) {
+                setData(data);
+            }
+        } catch (error) {
+            console.error("Error loading data:", error);
+        } finally {
+            setLoadingData(false);
+        }
+    }
+
+    fetchInfoData();
+
+  }, []);
+
+  useEffect(() => {
+    const fetchInfoTurnosPerYear = async () => {
+        if (HashTurnosPerYear[currentYear]) return;
+
+        setLoadingTurnos(true);
+        setLoadingCalendar(true);
+        try {
+            const data = await fetchTurnosPerYear(id, currentYear);
+            if (data) {
+                setHashTurnosPerYear((prev) => ({
+                    ...prev,
+                    [currentYear]: data.shifts,
+                }));
+
+                console.log("Turnos:", data.shifts);
+
+                setHashOccupiedDays((prev) => ({
+                    ...prev,
+                    [currentYear]: data.occupied_days,
+                }));
+                console.log("Occupied days:", data.occupied_days);
+            }
+        } catch (error) {
+            console.error("Error loading turnos:", error);
+        } finally {
+            setLoadingCalendar(false);
+        }
+    }
+    fetchInfoTurnosPerYear();
+  }, [currentYear]);
+
 
   console.log("Activity ID:", id);
 
@@ -51,93 +87,103 @@ const data = {
     () => {
         console.log("Selected day pg:", selectedDay);
         //hacer un fetch de los turnos correspondientes a ese dia
-        if (!selectedDay) return;
+        setLoadingTurnos(true);
+        if (!selectedDay || !HashTurnosPerYear[currentYear]) return;
+
+        setTurnos(HashTurnosPerYear[currentYear][selectedDay] || []);
         
-        setTurnos([
-            {
-                id: 1,
-                startTime: "08:00",
-                endTime: "10:00",
-                freeVacancies: 5,
-            },
-            {
-                id: 2,
-                startTime: "10:00",
-                endTime: "12:00",
-                freeVacancies: 0,
-            },
-            {
-                id: 3,
-                startTime: "12:00",
-                endTime: "14:00",
-                freeVacancies: 2,
-            },
-        ]);
+        setLoadingTurnos(false);
+        console.log("Turnos:", HashTurnosPerYear[currentYear][selectedDay]);
     }, [selectedDay]);
 
-
-
-  return (
+return (
     <>
     <div className={styles.container}>
-        <ActivityBanner info={{
+        {
+            loadingData ? (
+            <div className={styles.loading}>
+                Cargando datos de la actividad...
+            </div> ) :
+            (
+            <>
+            <ActivityBanner info={{
             imagesList: data.imagesList,
             location: data.location.address,
             title: data.title,
             minAge: data.minAge,
             price: data.price,
             stars: data.stars
-        }}/>
+            }}/>
 
-        <div className={styles.activityContent}>
-            <div className={styles.activityDetails}>
-                <div className={styles.apartado}>
-                    Descripción:
-                </div>
-                {data.description}
-                <div className={styles.apartado}>
-                    Características:
-                </div>
-                <div className={styles.featuresContainer}>
-                    {
-                        Object.entries(data.features).map(([key, value]) => (
-                            <Feature key={key} name={key} content={value} />
-                        ))
-                    }
-                </div>
-                <div className={styles.apartado}>
-                    Ubicación:
-                </div>
-                <div className={styles.mapContainer}>
-                    <SimpleMap location={{lat: data.location.lat, lng: data.location.lng}}/>
-                </div>
-                <div className={styles.fullLocation}>
-                    {data.location.full_address}
-                </div>
-            </div>
-            <div className={styles.turnosDetails}>
-                <div className={styles.group}>
-                    Elige una fecha disponible:
-                    <div className={styles.calendarContainer}>
-                        <CalendarSlider occupiedDays={data.occupiedDays} selectedDay={selectedDay} setSelectedDay={setSelectedDay} zonaHoraria="en-CA" />
+            <div className={styles.activityContent}>
+                <div className={styles.activityDetails}>
+                    <div className={styles.apartado}>
+                        Descripción:
+                    </div>
+                    {data.description}
+                    <div className={styles.apartado}>
+                        Características:
+                    </div>
+                    <div className={styles.featuresContainer}>
+                        {
+                           data.features.map((feature, index) => (
+                            <Feature key={index} name={feature.name} content={feature.value} />
+                          ))                           
+                        }
+                    </div>
+                    <div className={styles.apartado}>
+                        Ubicación:
+                    </div>
+                    <div className={styles.mapContainer}>
+                        <SimpleMap location={{lat: data.location.lat, lng: data.location.lng}}/>
+                    </div>
+                    <div className={styles.fullLocation}>
+                        {data.location.full_address}
                     </div>
                 </div>
-                <div className={styles.group}>
-                    Turnos disponibles el {selectedDay}:
-                    <div className={styles.turnosContainer}>
+                <div className={styles.turnosDetails}>
+                    <div className={styles.group}>
+                        Elige una fecha disponible:
                         {
-                            turnos.length > 0 ? (
-                                turnos.map(turno => (
-                                    <ActivityTurno key={turno.id} turno={turno} />
-                                ))
+                            loadingCalendar ? (
+                                <div className={styles.loading}>
+                                    Cargando calendario...
+                                </div>
                             ) : (
-                                <div>No hay turnos disponibles para esta fecha.</div>
+                                <div className={styles.calendarContainer}>
+                                    <CalendarSlider occupiedDays={hashOccupiedDays[currentYear] || []} selectedDay={selectedDay} setSelectedDay={setSelectedDay} zonaHoraria="en-CA" currentYear={currentYear} setCurrentYear={setCurrentYear} currentMonth={currentMonth} setCurrentMonth={setCurrentMonth} />
+                                </div>
+                            )
+                        }
+                    </div>
+                    <div className={styles.group}>
+                        Turnos disponibles el {selectedDay}:
+                        {
+                            loadingTurnos ? (
+                                <div className={styles.loading}>
+                                    Cargando turnos...
+                                </div>
+                            ) :
+                            (
+                                <div className={styles.turnosContainer}>
+                                    {
+                                        turnos.length > 0 ? (
+                                            turnos.map(turno => (
+                                                <ActivityTurno key={turno.id} turno={turno} />
+                                            ))
+                                        ) : (
+                                            <div>No hay turnos disponibles para esta fecha.</div>
+                                        )
+                                    }
+                                </div>
                             )
                         }
                     </div>
                 </div>
             </div>
-        </div>
+            </>
+            )
+        }
     </div>
     <Footer/>
     </>

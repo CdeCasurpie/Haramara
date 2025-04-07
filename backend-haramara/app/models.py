@@ -199,7 +199,7 @@ class ShiftActivities(db.Model):
 class Cupos(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_ShiftActivity = db.Column(db.Integer, db.ForeignKey('shift_activities.id'))
-    fecha = db.Column(db.Date)
+    fecha = db.Column(db.Date, primary_key=True)
     free_vacancies = db.Column(db.Integer, nullable=False)
 
     def save(self):
