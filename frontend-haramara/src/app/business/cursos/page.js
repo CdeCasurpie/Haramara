@@ -268,6 +268,7 @@ export default function Cursos() {
                                 }}
                                 setCurrentCourse={() => handleEditCourse(info)}
                                 setIsEditing={setIsEditing}
+                                isEditing={isEditing && currentCourse && currentCourse.id === info.id}
                             />
                         ))}
                     </CustomSlider>
@@ -310,7 +311,7 @@ export default function Cursos() {
                     </div>
 
                     {activeTab === 'formulario' ? (
-                        <div className={styles.formularioContainer}>
+                        <div style={{ height: '80%', overflowY: 'scroll' }}>
                             <CourseForm 
                                 courseData={currentCourse}
                                 setCourseData={setCurrentCourse}
@@ -323,47 +324,49 @@ export default function Cursos() {
                             />
                         </div>
                     ) : (
-                        <form className={stylesCursos.turnosContenido} onSubmit={handleTurnoAddSubmit}>
-                            <div className={stylesCursos.formTurnos}>
-                                <div className={stylesCursos.formRow}>
-                                    <div className={stylesCursos.formGroup}>
-                                        <label className={stylesCursos.label}>Hora de inicio: </label>
-                                        <input
-                                            type="time"
-                                            name="startTime"
-                                            className={stylesCursos.input}
-                                            value={TurnosFormData.startTime}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>  
-                                    <div className={stylesCursos.formGroup}>
-                                        <label className={stylesCursos.label}>Hora de fin: </label>
-                                        <input
-                                            type="time"
-                                            name="endTime"
-                                            className={stylesCursos.input}
-                                            value={TurnosFormData.endTime}
-                                            onChange={handleInputChange}
-                                            required
-                                        />
-                                    </div>  
+                        <div style={{ height: '80%', overflowY: 'scroll' }}>
+                            <form className={stylesCursos.turnosContenido} onSubmit={handleTurnoAddSubmit}>
+                                <div className={stylesCursos.formTurnos}>
+                                    <div className={stylesCursos.formRow}>
+                                        <div className={stylesCursos.formGroup}>
+                                            <label className={stylesCursos.label}>Hora de inicio: </label>
+                                            <input
+                                                type="time"
+                                                name="startTime"
+                                                className={stylesCursos.input}
+                                                value={TurnosFormData.startTime}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>  
+                                        <div className={stylesCursos.formGroup}>
+                                            <label className={stylesCursos.label}>Hora de fin: </label>
+                                            <input
+                                                type="time"
+                                                name="endTime"
+                                                className={stylesCursos.input}
+                                                value={TurnosFormData.endTime}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>  
+                                    </div>
+                                    <div className={stylesCursos.formRow}>
+                                        <Days days={days} setDays={setDays} editing={true} />
+                                        <HaramaraButton className={stylesCursos.buttonSave} type="submit">
+                                            Añadir Turno +
+                                        </HaramaraButton>
+                                    </div>
                                 </div>
-                                <div className={stylesCursos.formRow}>
-                                    <Days days={days} setDays={setDays} editing={true} />
-                                    <HaramaraButton className={stylesCursos.buttonSave} type="submit">
-                                        Añadir Turno +
-                                    </HaramaraButton>
+                                <div className={stylesCursos.turnosContainer}>
+                                    {
+                                    turnos.map((turno) => (
+                                        <TurnoCurso key={turno.id} turno={turno} />
+                                    ))
+                                    }
                                 </div>
-                            </div>
-                            <div className={stylesCursos.turnosContainer}>
-                                {
-                                turnos.map((turno) => (
-                                    <TurnoCurso key={turno.id} turno={turno} />
-                                ))
-                                }
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     )}
 
                     <div className={styles.footerPanel}>

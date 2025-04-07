@@ -2,6 +2,7 @@
 
 import React, { act } from 'react';
 import styles from './BusinessActivity.module.css';
+import Gallery from '@/components/Gallery';
 
 const BusinessActivity = ({
   activity,
@@ -44,11 +45,18 @@ const BusinessActivity = ({
   return (
     <div className={styles.card}>
       <div className={styles.imageContainer}>
-        <img
-          src={"/images/general/placeholder_image.png"} 
-          alt={activity.title}
-          className={styles.image} 
-        />
+        {activity.images && activity.images.length > 0 ? (
+          <Gallery 
+            images={activity.images.map(img => typeof img === 'string' ? img : img.url)} 
+            autoPlay={false} 
+          />
+        ) : (
+          <img
+            src="/images/general/placeholder_image.png"
+            alt={activity.title}
+            className={styles.image} 
+          />
+        )}
       </div>
       
       <div className={styles.contentContainer}>

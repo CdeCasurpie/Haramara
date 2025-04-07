@@ -17,14 +17,13 @@
 
 .profileName{
     font-size: 1rem;
-    font-weight: 500;
     color: var(--primary-color);
     margin-bottom: 5px;
 }
 
 .profileRole{
     font-size: 0.8rem;
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--text-color-secondary);
 }
 
 .profileImage{

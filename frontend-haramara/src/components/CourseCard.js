@@ -5,7 +5,7 @@ import Price from './Price';
 import HaramaraButton from './HaramaraButton';
 
 
-export default function CourseCard({ info, setCurrentCourse, setIsEditing }) {
+export default function CourseCard({ info, setCurrentCourse, setIsEditing, isEditing = false }) {
     /*
     id,
     imageList,
@@ -23,6 +23,11 @@ export default function CourseCard({ info, setCurrentCourse, setIsEditing }) {
 
     const handleInscription = () => {
         console.log("Inscribirse en el curso");
+    }
+    
+    const handleEdit = () => {
+        setCurrentCourse(info);
+        setIsEditing(true);
     }
 
     return (
@@ -80,16 +85,6 @@ export default function CourseCard({ info, setCurrentCourse, setIsEditing }) {
                 {
                     info.business ? (
                         <div className={styles.rightBusiness}>
-                            <div className={styles.editContainer}
-                                onClick={() =>{ setCurrentCourse(info); setIsEditing(true); }}
-                            >
-                                <Image
-                                    src="/images/general/edit.svg"
-                                    alt="Editar"
-                                    width={20}
-                                    height={20}
-                                />
-                            </div>
                             <div className={styles.revenueContainer}>
                                 < div className = {styles.reservationInfo} >
                                     <div className = {styles.reservationReveneu}>
@@ -102,9 +97,12 @@ export default function CourseCard({ info, setCurrentCourse, setIsEditing }) {
                                         {info.num_reservations} reservas realizadas
                                     </div>
                                 </div>
-                                <HaramaraButton  variant="primary" onClick={handleInscription} className={styles.shortButton}>
-                                    <p> VER DETALLE  &#x276F;</p>
-                                </HaramaraButton>
+                            <button
+                                className={isEditing ? styles.editingButton : styles.editButton}
+                                onClick={handleEdit}
+                            >
+                                {isEditing ? 'Editando' : 'Editar'}
+                            </button>
                             </div>
                         </div>
                     ) :

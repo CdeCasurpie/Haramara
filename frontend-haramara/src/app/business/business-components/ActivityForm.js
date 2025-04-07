@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './ActivityForm.module.css';
 import LocationField from './LocationField';
+import API_BASE_URL from '@/config';
 
 const ActivityForm = ({
   activity,
   setSelectedActivity
 }) => {
   const [newCharacteristic, setNewCharacteristic] = React.useState({ name: '', value: '' });
+  const [imageSources, setImageSources] = useState({});
   const fileInputRef = useRef(null);
 
   // Si la actividad es null, se crea una nueva actividad
@@ -80,6 +82,37 @@ const ActivityForm = ({
   // Botón para abrir el selector de archivos
   const handleImageButtonClick = () => {
     fileInputRef.current.click();
+  };
+
+  // Función para manejar errores de carga de imágenes
+  const handleImageError = (index, imageUrl) => {
+    // Obtener el estado actual de esta imagen
+    const currentSource = imageSources[index] || 0;
+    
+    // Actualizar al siguiente estado
+    const nextSource = currentSource + 1;
+    setImageSources({
+      ...imageSources,
+      [index]: nextSource
+    });
+  };
+
+  // Función para determinar la fuente de la imagen según el estado
+  const getImageSource = (index, imageUrl) => {
+    const sourceState = imageSources[index] || 0;
+    
+    switch (sourceState) {
+      case 0: // Primer intento: con dominio del backend
+        // Verificar si la URL ya es una URL completa o una URL de datos
+        if (imageUrl.startsWith('http') || imageUrl.startsWith('data:')) {
+          return imageUrl;
+        }
+        return `${API_BASE_URL}${imageUrl}`;
+      case 1: // Segundo intento: solo la URL
+        return imageUrl;
+      default: // Último recurso: imagen placeholder
+        return '/images/general/placeholder_image.png';
+    }
   };
 
   // Añadir una nueva característica
@@ -237,9 +270,10 @@ const ActivityForm = ({
               activity.images.map((image, index) => (
                 <div key={index} className={styles.imageThumbContainer}>
                   <img 
-                    src={image.url} 
+                    src={getImageSource(index, image.url)}
                     alt={`Imagen ${index + 1}`} 
-                    className={styles.imageThumb} 
+                    className={styles.imageThumb}
+                    onError={() => handleImageError(index, image.url)}
                   />
                   <button 
                     type="button" 

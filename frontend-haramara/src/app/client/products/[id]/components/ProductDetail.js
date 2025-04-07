@@ -114,29 +114,52 @@ const ProductDetail = ({ id }) => {
           {/* Left side - Image Gallery with loading effect */}
           <div className={styles.galleryContainer}>
             <div className={styles.mainImageContainerLoading}>
-              <div className={styles.loadingImage}></div>
+              <div className={styles.skeletonImage}></div>
             </div>
             <div className={styles.thumbnailsContainer}>
               {[1, 2, 3].map((_, index) => (
-                <div key={index} className={styles.thumbnailLoading}></div>
+                <div key={index} className={styles.skeletonThumbnail}></div>
               ))}
             </div>
           </div>
           
           {/* Right side - Product details with loading effect */}
           <div className={styles.detailsContainer}>
-            <div className={styles.loadingTitle}></div>
-            <div className={styles.loadingPrice}></div>
-            <div className={styles.loadingDescription}></div>
-            <div className={styles.loadingDescription}></div>
-            <div className={styles.loadingButton}></div>
+            <div className={styles.skeletonTitle}></div>
+            
+            <div className={styles.skeletonPriceContainer}>
+              <div className={styles.skeletonOriginalPrice}></div>
+              <div className={styles.skeletonPrice}></div>
+            </div>
+            
+            <div className={styles.skeletonStock}></div>
+            
+            <div className={styles.skeletonDescription}></div>
+            
+            <div className={styles.skeletonVariantsTitle}></div>
+            <div className={styles.skeletonVariantsList}>
+              {[1, 2, 3, 4].map((_, index) => (
+                <div key={index} className={styles.skeletonVariant}></div>
+              ))}
+            </div>
+            
+            <div className={styles.skeletonActionContainer}>
+              <div className={styles.skeletonQuantity}></div>
+              <div className={styles.skeletonButton}></div>
+            </div>
+            
+            <div className={styles.skeletonTags}>
+              {[1, 2, 3, 4].map((_, index) => (
+                <div key={index} className={styles.skeletonTag}></div>
+              ))}
+            </div>
           </div>
         </div>
         
         {/* Specifications with loading effect */}
         <div className={styles.specificationsContainer}>
-          <h2 className={styles.specTitle}>Especificaciones:</h2>
-          <div className={styles.loadingSpecTable}></div>
+          <div className={styles.skeletonSpecTitle}></div>
+          <div className={styles.skeletonSpecTable}></div>
         </div>
       </div>
     );
@@ -231,18 +254,16 @@ const ProductDetail = ({ id }) => {
         <div className={styles.detailsContainer}>
           <h1 className={styles.productName}>{product.name}</h1>
           
-          {selectedVariant && (
-            <div className={styles.priceContainer}>
-              {selectedVariant.original_price && selectedVariant.original_price > selectedVariant.price ? (
-                <>
-                  <span className={styles.originalPrice}>EUR {selectedVariant.original_price}</span>
-                  <span className={styles.price}>EUR {selectedVariant.price}</span>
-                </>
-              ) : (
+          <div className={styles.priceContainer}>
+            {selectedVariant?.original_price && selectedVariant.original_price > selectedVariant.price ? (
+              <>
+                <span className={styles.originalPrice}>EUR {selectedVariant.original_price}</span>
                 <span className={styles.price}>EUR {selectedVariant.price}</span>
-              )}
-            </div>
-          )}
+              </>
+            ) : (
+              <span className={styles.price}>EUR {selectedVariant?.price}</span>
+            )}
+          </div>
           
           <p className={styles.stockInfo}>
             {selectedVariant ? 
