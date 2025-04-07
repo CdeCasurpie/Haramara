@@ -6,6 +6,7 @@ import Image from "next/image";
 import { StarIcon } from "lucide-react";
 import StarsRating from "./Stars";
 import Price from "./Price";
+import Link from "next/link";
 
 export default function ActivityCard({info}) {
     /*
@@ -19,10 +20,6 @@ export default function ActivityCard({info}) {
     onSubmit,
     */
 
-    const handleReservationDetails = () => {
-        console.log("ver detalles de la reservación");
-    }
-    
     return (
         <div className={styles.container}>
             <div className={styles.imageContainer}>
@@ -66,9 +63,11 @@ export default function ActivityCard({info}) {
                     <div className={styles.right}>
                         <Price price={info.price} />
                         <div className={styles.buttonContainer}>
-                            <HaramaraButton variant="principal" onClick={handleReservationDetails} className={styles.shortButton}>
-                                <p>VER MÁS &#x276F;</p>
-                            </HaramaraButton>
+                            <Link href={`/client/activities/${info.id}`} passHref>
+                                <HaramaraButton variant="principal" className={styles.shortButton}>
+                                    <p>VER MÁS &#x276F;</p>
+                                </HaramaraButton>
+                            </Link>
                         </div>
                     </div>
                 </div>

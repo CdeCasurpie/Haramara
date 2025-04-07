@@ -448,3 +448,8 @@ def delete_activity(activity_id):
             "success": False,
             "message": f"Error al eliminar la actividad: {str(e)}"
         }), 500
+
+
+# Rutas para el cliente
+
+
