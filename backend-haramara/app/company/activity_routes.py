@@ -2,8 +2,11 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import Activities, Services, ImagesServices, ShiftActivities, Cupos, db
 from app.auth.decorators import login_business_required
+from app.utils import save_base64_image
 from datetime import datetime, timedelta
 import json
+import os
+from werkzeug.utils import secure_filename
 
 activity_bp = Blueprint('activity_bp', __name__)
 
@@ -172,54 +175,80 @@ def create_activity():
                           'initial_vacancies', 'characteristics', 'tags', 'location']
         
         for field in required_fields:
-            if field not in data or data[field] is "" or data[field] is None:
+            if field not in data or data[field] == "" or data[field] is None:
                 return jsonify({
                     "success": False,
                     "message": f"El campo {field} es requerido"
                 }), 400
         
-        # Crear o obtener servicio asociado a la empresa
-        service = Services(company_id=company_id)
-        service.save()
+        # Crear servicio asociado a la empresa
+        with db.session.begin():
+            service = Services(company_id=company_id)
+            db.session.add(service)
+            db.session.flush()
 
-        # location a string, pasar objeto a string con json.dumps
-        print(data['location'])
-        location = json.dumps(data['location'])
-        print(location)
+            # Configuración de directorio de imágenes de un servicio
+            upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads', 'services', str(service.id))
+            os.makedirs(upload_folder, exist_ok=True)
 
-        # Crear la actividad
-        activity = Activities(
-            id_service=service.id,
-            titulo=data['title'],
-            ubicacion=location,
-            price_per_person=float(data['price_per_person']),
-            description=data['description'],
-            features=data.get('characteristics', {}),
-            min_age=int(data['min_age']),
-            initial_vacancies=int(data['initial_vacancies']),
-            tags=data.get('tags', '')
-        )
-        activity.save()
+            # location a string, pasar objeto a string con json.dumps
+            location = json.dumps(data['location'])
+
+            # Crear la actividad
+            activity = Activities(
+                id_service=service.id,
+                titulo=data['title'],
+                ubicacion=location,
+                price_per_person=float(data['price_per_person']),
+                description=data['description'],
+                features=data.get('characteristics', {}),
+                min_age=int(data['min_age']),
+                initial_vacancies=int(data['initial_vacancies']),
+                tags=data.get('tags', '')
+            )
+            db.session.add(activity)
+            db.session.flush()
             
-        # Procesar imágenes si existen
-        if 'images' in data and isinstance(data['images'], list):
-            for image_data in data['images']:
-                if isinstance(image_data, dict) and 'url' in image_data:
-                    image = ImagesServices(
-                        url_image=image_data['url'],
-                        id_service=service.id
-                    )
-                    image.save()
-        
-        return jsonify({
-            "success": True,
-            "message": "Actividad creada exitosamente",
-            "activity_id": activity.id
-        }), 201
+            image_paths = []
+            
+            # Procesar imágenes si existen
+            if 'images' in data and isinstance(data['images'], list):
+                for image_data in data['images']:
+                    if isinstance(image_data, dict) and 'url' in image_data:
+                        image_url = image_data['url']
+                        
+                        # Verificar si es una imagen en base64
+                        if image_url.startswith('data:image'):
+                            # Guardar la imagen base64 en el sistema de archivos
+                            saved_url = save_base64_image(image_url, upload_folder)
+                            if saved_url:
+                                # Crear la entrada en la base de datos con la nueva URL
+                                image = ImagesServices(
+                                    url_image=saved_url,
+                                    id_service=service.id
+                                )
+                                db.session.add(image)
+                                image_paths.append(saved_url)
+                        else:
+                            # Es una URL normal, usarla directamente
+                            image = ImagesServices(
+                                url_image=image_url,
+                                id_service=service.id
+                            )
+                            db.session.add(image)
+                            image_paths.append(image_url)
+            
+            return jsonify({
+                "success": True,
+                "message": "Actividad creada exitosamente",
+                "activity_id": activity.id,
+                "images": image_paths
+            }), 201
         
     except Exception as e:
         # En caso de error, hacer rollback de la transacción
         db.session.rollback()
+        print(f"Error al crear la actividad: {str(e)}")
         return jsonify({
             "success": False,
             "message": f"Error al crear la actividad: {str(e)}"
@@ -230,12 +259,13 @@ def create_activity():
 @login_business_required
 def update_activity(activity_id):
     """
-    Actualiza una actividad existente
+    Actualiza una actividad existente y gestiona las imágenes:
+    1. Mantiene solo las imágenes que vienen en el JSON
+    2. Elimina todas las demás imágenes (físicamente y de la BD)
+    3. Añade imágenes nuevas si hay en base64
     """
     company_id = get_jwt_identity()
     data = request.get_json()
-
-    print(data)
     
     try:
         # Verificar que la actividad pertenezca a la empresa
@@ -270,36 +300,86 @@ def update_activity(activity_id):
         if 'location' in data and data['location']:
             activity.ubicacion = json.dumps(data['location'])
         
-        # Guardar los cambios en la actividad
-        activity.save()
+        # Obtener servicio asociado
+        service_id = activity.id_service
         
-        # Actualizar imágenes si se proporcionan
+        # Configuración de directorio de imágenes del servicio
+        upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads', 'services', str(service_id))
+        os.makedirs(upload_folder, exist_ok=True)
+        
+        # PASO 1: Listar todas las imágenes actuales del servicio
+        current_images = ImagesServices.query.filter_by(id_service=service_id).all()
+        current_image_urls = {img.url_image: img for img in current_images}
+        
+        # Extraer las URLs de imágenes que vienen en el JSON
+        incoming_image_urls = []
         if 'images' in data and isinstance(data['images'], list):
-            print(data['images'])
-            # Obtener servicio asociado
-            service_id = activity.id_service
+            for img in data['images']:
+                if isinstance(img, dict) and 'url' in img:
+                    # Solo considerar las URLs que no son base64
+                    if not img['url'].startswith('data:image'):
+                        incoming_image_urls.append(img['url'])
+        
+        # PASO 2: Identificar imágenes a eliminar (las que no están en el JSON)
+        images_to_delete = []
+        for url, img_obj in current_image_urls.items():
+            if url not in incoming_image_urls:
+                images_to_delete.append((url, img_obj))
+        
+        # PASO 3: Eliminar las imágenes identificadas
+        for url, img_obj in images_to_delete:
+            # Eliminar archivo físico si es una imagen local
+            if not url.startswith(('http://', 'https://')):
+                # Construir la ruta completa al archivo
+                file_path = os.path.join(os.getcwd(), 'app', url.lstrip('/'))
+                if os.path.exists(file_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"Archivo eliminado: {file_path}")
+                    except OSError as e:
+                        print(f"Error al eliminar archivo de imagen: {str(e)}")
             
-            # Eliminar imágenes existentes si se proporciona una nueva lista completa
-            ImagesServices.query.filter_by(id_service=service_id).delete()
-            
-            # Agregar nuevas imágenes
+            # Eliminar de la base de datos
+            db.session.delete(img_obj)
+        
+        # PASO 4: Procesar imágenes nuevas en base64
+        if 'images' in data and isinstance(data['images'], list):
             for image_data in data['images']:
                 if isinstance(image_data, dict) and 'url' in image_data:
-                    image = ImagesServices(
-                        url_image=image_data['url'],
-                        id_service=service_id
-                    )
-                    image.save()
+                    image_url = image_data['url']
+                    
+                    # Verificar si es una imagen en base64
+                    if image_url.startswith('data:image'):
+                        # Guardar la imagen base64 en el sistema de archivos
+                        saved_url = save_base64_image(image_url, upload_folder)
+                        if saved_url:
+                            # Crear la entrada en la base de datos con la nueva URL
+                            new_image = ImagesServices(
+                                url_image=saved_url,
+                                id_service=service_id
+                            )
+                            db.session.add(new_image)
+        
+        # Guardar los cambios en la base de datos
+        db.session.add(activity)
+        db.session.commit()
+        
+        # Obtener todas las imágenes actuales después de los cambios
+        updated_images = ImagesServices.query.filter_by(id_service=service_id).all()
+        images_list = [{"id": img.id, "url": img.url_image} for img in updated_images]
         
         return jsonify({
             "success": True,
             "message": "Actividad actualizada exitosamente",
-            "activity_id": activity.id
+            "activity_id": activity.id,
+            "images": images_list,
+            "deleted_count": len(images_to_delete)
         }), 200
         
     except Exception as e:
         # En caso de error, hacer rollback de la transacción
         db.session.rollback()
+        print(f"Error al actualizar la actividad: {str(e)}")
         return jsonify({
             "success": False,
             "message": f"Error al actualizar la actividad: {str(e)}"
@@ -426,12 +506,38 @@ def delete_activity(activity_id):
         # Eliminar la actividad
         activity.delete()
         
-        # Opcional: Eliminar imágenes asociadas al servicio si ya no hay otras actividades
+        # Obtener imágenes asociadas al servicio
+        images = ImagesServices.query.filter_by(id_service=service_id).all()
+        
+        # Verificar si quedan otras actividades asociadas al servicio
         remaining_activities = Activities.query.filter_by(id_service=service_id).count()
+        
+        # Si no hay más actividades, eliminar las imágenes y el servicio
         if remaining_activities == 0:
+            # Eliminar archivos físicos de imágenes
+            for image in images:
+                # Solo eliminar archivos locales (no URLs externas)
+                if not image.url_image.startswith(('http://', 'https://')):
+                    file_path = os.path.join(os.getcwd(), 'app', image.url_image.lstrip('/'))
+                    if os.path.exists(file_path):
+                        try:
+                            os.remove(file_path)
+                        except OSError as e:
+                            print(f"Error al eliminar archivo de imagen: {str(e)}")
+            
+            # Eliminar registros de imágenes de la base de datos
             ImagesServices.query.filter_by(id_service=service_id).delete()
             
-            # Opcional: Eliminar el servicio si ya no tiene otras actividades
+            # Eliminar el directorio de imágenes del servicio si está vacío
+            upload_dir = os.path.join(os.getcwd(), 'app', 'static', 'uploads', 'services', str(service_id))
+            if os.path.exists(upload_dir):
+                try:
+                    # Intentar eliminar el directorio (solo funcionará si está vacío)
+                    os.rmdir(upload_dir)
+                except OSError as e:
+                    print(f"No se pudo eliminar el directorio de imágenes: {str(e)}")
+            
+            # Eliminar el servicio
             service = Services.query.get(service_id)
             if service:
                 service.delete()

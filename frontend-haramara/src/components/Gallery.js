@@ -7,7 +7,7 @@ import API_BASE_URL from "@/config";
 const Gallery = ({ images, autoPlay = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fade, setFade] = useState(true);
-  const [imageErrors, setImageErrors] = useState({});
+  const [imageSources, setImageSources] = useState({});
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -37,34 +37,44 @@ const Gallery = ({ images, autoPlay = false }) => {
     return () => clearInterval(interval);
   }, [currentIndex, autoPlay]);
 
-  // Function to determine the image source with fallbacks
+  // Función para manejar errores de carga de imágenes
+  const handleImageError = (index) => {
+    // Obtener el estado actual de esta imagen
+    const currentSource = imageSources[index] || 0;
+    
+    // Actualizar al siguiente estado
+    const nextSource = currentSource + 1;
+    setImageSources({
+      ...imageSources,
+      [index]: nextSource
+    });
+  };
+
+  // Función para determinar la fuente de la imagen según el estado
   const getImageSrc = (index) => {
     if (!images || !images[index]) {
       return "/images/general/placeholder_image.png";
     }
 
     const image = images[index];
-
-    // If there's an error for this image, try local path
-    if (imageErrors[index]) {
-      // Try to load from local public directory
-      return image.startsWith("/") ? image : `/${image}`;
+    const sourceState = imageSources[index] || 0;
+    
+    switch (sourceState) {
+      case 0: // Primer intento: con dominio del backend
+        // Verificar si la URL ya es completa o una URL de datos
+        if (image.startsWith('http') || 
+            image.startsWith('data:') || 
+            image.startsWith('blob:')) {
+          return image;
+        }
+        return `${API_BASE_URL}${image}`;
+      
+      case 1: // Segundo intento: solo la URL
+        return image.startsWith('/') ? image : `/${image}`;
+      
+      default: // Último recurso: imagen placeholder
+        return "/images/general/placeholder_image.png";
     }
-
-    // Use blob URL directly
-    if (image.startsWith("blob:")) {
-      return image;
-    }
-
-    // Use API_BASE_URL if it's a relative path from backend
-    return API_BASE_URL + image;
-  };
-
-  const handleImageError = (index) => {
-    setImageErrors(prev => ({
-      ...prev,
-      [index]: true
-    }));
   };
 
   return (
