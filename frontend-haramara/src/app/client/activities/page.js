@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Search, MapPin } from 'lucide-react';
 import CustomInputText from '@/components/CustomInputText';
@@ -10,6 +10,7 @@ import HaramaraButton from '@/components/HaramaraButton';
 import StarsRating from '@/components/Stars';
 import ActivityMap from '@/components/ActivityMap';
 import { fetchActivities, fetchFeaturedActivity } from './utils';
+
 import styles from './activities.module.css';
 import ActivityCard from '@/components/ActivityCard';
 
@@ -19,28 +20,74 @@ export default function ClientActivitiesPage() {
   const [location, setLocation] = useState('');
   const [activityType, setActivityType] = useState('todas');
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const page_size = 2; // Number of activities per page
+  const loaderRef = useRef(null);
+  const [maxPage, setMaxPage] = useState(null);
+  const pageRef = useRef(page);
+  const maxPageRef = useRef(maxPage);
 
   // Simulated loading of activities
   useEffect(() => {
+    console.log("me estoy ejecutando");
+    pageRef.current = page;
     const loadData = async () => {
       setLoading(true);
       try {
         // Get all activities
-        const activitiesData = await fetchActivities();
-        setActivities(activitiesData);
+        const activitiesData = await fetchActivities(page, page_size);
+        // settear maxPage si aún no se ha seteado	
+        if (maxPage === null) {
+          setMaxPage(activitiesData.pagination.total_pages);
+          console.log("Max page set to:", activitiesData.pagination.total_pages);
+          maxPageRef.current = activitiesData.pagination.total_pages;
+        }
+
+        console.log("Activities data of page:", page, ":", activitiesData);
+        // append activitiesData to activities
+        setActivities((prev) => [...prev, ...activitiesData.activities]);
       } catch (error) {
         console.error("Error loading activities:", error);
       } finally {
         setLoading(false);
       }
     };
-    
-    loadData();
+    if(maxPage === null || page <= maxPage) {
+      loadData();
+    }
+    console.log("Loading activities for page:", page);
+  }, [page]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting &&(maxPageRef.current === null || pageRef.current < maxPageRef.current)) {
+          //if (loading) return;
+          setPage((prevPage) => prevPage + 1);
+          console.log("maxPage:", maxPageRef.current);
+          console.log("Loading next page:", pageRef.current + 1);
+        }
+      },
+      {
+        threshold: 1.0,
+      }
+    );
+  
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+  
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
   }, []);
 
   const handleSearch = () => {
     console.log("Searching for:", { searchTerm, location, activityType });
   };
+  
 
   return (
     <div className={styles.container}>
@@ -87,13 +134,21 @@ export default function ClientActivitiesPage() {
         <div className={styles.contentColumns}>
           {/* Activities List */}
           <div className={styles.activitiesList}>
-            {loading ? (
-              <div className={styles.loading}>Cargando actividades...</div>
-            ) : (
-              activities.map((activity) => (
-                <ActivityCard key={activity.id} info={activity} />
-              ))
+            {activities.map((activity) => (
+              <ActivityCard key={activity.id} info={activity} />
+            ))}
+
+            {loading && <div className={styles.loading}>Cargando actividades...</div>}
+
+            {/* Infinite scroll trigger */}
+            <div ref={loaderRef} className={styles.loaderRef}></div>
+
+            {/* Mensaje de fin de las actividades */}
+            {maxPage !== null && page >= maxPage && (
+              <div className={styles.endMessage}>No hay más actividades para mostrar.</div>
             )}
+
+
           </div>
 
           {/* Map Section */}
