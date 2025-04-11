@@ -607,7 +607,9 @@ def get_all_activities():
                 "rating": 4.5,  # Valor de ejemplo (podría calcularse de reseñas)
                 "num_reservations": 10,  # Valor de ejemplo (podría calcularse de reservas)
                 "images": images_data,
-                "location": json.loads(activity.ubicacion)
+                "location": json.loads(activity.ubicacion),
+                "tags": activity.tags,
+                "min_age": activity.min_age,
             }
             activities_data.append(activity_data)
         
